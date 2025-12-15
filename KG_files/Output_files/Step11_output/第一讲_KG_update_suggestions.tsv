@@ -1,0 +1,3 @@
+update_id	qid	action	entity1_name	entity2_name	entity1_id	entity2_id	relation_type_old	relation_type_new	reason	revision_reason
+u00001	q0012	add_edge	最高人民法院	时间效力问题的规定	n00022	n00055		related_to	修改后的问题引入了新的实体组合，但 KG 中两者没有关系，建议添加边	修正题干以提高流畅度和忠实性，使用完整司法解释名称确保准确；改进干扰项设计（如C选项调整为修订版本以增强迷惑性）；覆盖核心知识点（司法解释文件结构关系）。
+u00002	q0012	add_edge	最高人民法院	关于适用刑事司法解	n00022	n00054		related_to	修改后的问题引入了新的实体组合，但 KG 中两者没有关系，建议添加边	修正题干以提高流畅度和忠实性，使用完整司法解释名称确保准确；改进干扰项设计（如C选项调整为修订版本以增强迷惑性）；覆盖核心知识点（司法解释文件结构关系）。
