@@ -1,0 +1,3 @@
+edge_id	src_id	dst_id	relation_type	page_no	sentence_id	confidence
+e00001	n00006	n00004	related_to	4	s0098	0.5819281935691833
+e00002	n00008	n00004	related_to	6	s0172	0.5203490257263184

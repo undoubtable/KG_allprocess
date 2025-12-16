@@ -1,0 +1,13 @@
+node_id	label	name	page_no	sentence_id
+n00001	position	警察	2	s0034
+n00002	government	派出所	2	s0045
+n00003	name	丁铅	3	s0070
+n00004	name	小芳	3	s0081
+n00005	position	执行官	3	s0088
+n00006	name	小美	4	s0098
+n00007	position	交警	5	s0147
+n00008	name	鲍如	6	s0172
+n00009	position	医生	6	s0178
+n00010	address	本大阪南港	7	s0226
+n00011	position	司机	8	s0238
+n00012	name	狗剩	10	s0333

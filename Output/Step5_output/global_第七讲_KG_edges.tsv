@@ -1,0 +1,3 @@
+global_edge_id	src_id	dst_id	relation_type	confidence	example_page_no	example_sentence_id	example_kg
+ge00001	g00006	g00004	related_to	0.5819281935691833	4	s0098	第一讲
+ge00002	g00008	g00004	related_to	0.5203490257263184	6	s0172	第一讲

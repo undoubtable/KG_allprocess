@@ -1,0 +1,12 @@
+metric,value
+accuracy,0.5511386096477509
+avg_degree,0.3333333333333333
+avg_degree_score,0.03333333333333333
+clustering_coefficient,0.0
+giant_component_ratio,0.25
+completeness_score,0.09444444444444444
+self_loop_ratio,0.0
+duplicate_ratio,0.0
+consistency_score,1.0
+conciseness_score,1.0
+overall_quality_score,0.5712318467100461
