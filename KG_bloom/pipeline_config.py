@@ -6,13 +6,13 @@ import os
 PROJECT_ROOT = Path(os.getenv("KG_PROJECT_ROOT", r"D:\Desktop\KG_allprocess")).resolve()
 
 # 输入 PDF 文件（支持命令行/环境变量覆盖）
-PDF_PATH = Path(os.getenv("KG_PDF_PATH", str(PROJECT_ROOT / "PDF_files" / "第一讲.pdf"))).resolve()
+PDF_PATH = Path(os.getenv("KG_PDF_PATH", str(PROJECT_ROOT / "KG_files" / "第一讲.pdf"))).resolve()
 
 # 讲义名（用于输出文件前缀）
 LECTURE = os.getenv("KG_LECTURE", PDF_PATH.stem)  # 默认用pdf文件名当讲义名
 
 # 输出根目录
-OUT_ROOT = Path(os.getenv("KG_OUT_ROOT", str(PROJECT_ROOT / "Output"))).resolve()
+OUT_ROOT = Path(os.getenv("KG_OUT_ROOT", str(PROJECT_ROOT / "KG_bloom" / "Output_bloom"))).resolve()
 
 # 各 Step 输出目录
 # Step1
@@ -47,7 +47,7 @@ STEP7_KG_QUALITY_JSON = STEP7_DIR / f"{LECTURE}_KG_quality.json"
 STEP8_DIR = OUT_ROOT / "Step8_output"
 PROMPT_PATH = Path(os.getenv("PROMPT_PATH", str(PROJECT_ROOT / "KG_tools" / "prompt.txt"))).resolve()
 STEP8_Q_TSV = STEP8_DIR / f"{LECTURE}_MCQ.tsv"
-
+PROMPT_PATH_BLOOM = Path(os.getenv("PROMPT_PATH_BLOOM", str(PROJECT_ROOT / "KG_code" / "prompt_bloom_same_knowledge.txt"))).resolve()
 #Step9
 STEP9_DIR = OUT_ROOT / "Step9_output"
 STEP9_EVAL_TSV = STEP9_DIR / f"{LECTURE}_MCQ_eval.tsv"

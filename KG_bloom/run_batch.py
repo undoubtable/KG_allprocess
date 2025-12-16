@@ -6,7 +6,7 @@ from pathlib import Path
 PY = sys.executable
 BASE_DIR = Path(__file__).parent
 
-PDF_DIR = Path(os.getenv("KG_PDF_DIR", r"D:\Desktop\KG_allprocess\PDF_files")).resolve()
+PDF_DIR = Path(os.getenv("KG_files", r"D:\Desktop\KG_allprocess\KG_files")).resolve()
 
 PIPELINE_ENTRY = BASE_DIR / "run_pipeline.py"
 
