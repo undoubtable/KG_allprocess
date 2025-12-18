@@ -40,9 +40,11 @@ KG-QG 图谱自进化带来的高质量问题生成，目前只是一个想法�
 |      |  之后重复⑥、⑦即可，只需注意替换路径  |          | 用第⑩步的输出文件替换第⑥、⑦步的输入文件 |
 
 
-搭建了一整个自动化流程以用来生成数据进行测试。
+> [!IMPORTANT]
+> **我们也搭建一整个自动化流程以用来生成数据进行测试。**
+>
+> 【**自动化脚本的位置：**[pipeline_config.py](/KG_tools/pipeline_config.py)    [run_batch.py](/KG_tools/run_batch.py)    [run_pipeline.py](/KG_tools/run_pipeline.py)】（运行时直接运行 [./run_batch.py](/KG_tools/run_batch.py)  即可）
 
-【**自动化脚本的位置：**[pipeline_config.py](/KG_tools/pipeline_config.py)    [run_batch.py](/KG_tools/run_batch.py)    [run_pipeline.py](/KG_tools/run_pipeline.py)】（运行时直接运行 [./run_batch.py](/KG_tools/run_batch.py)  即可）
 
 GitHub代码地址：[https://github.com/undoubtable/KG_allprocess.git](https://github.com/undoubtable/KG_allprocess.git)
 
