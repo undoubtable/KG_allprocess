@@ -6,7 +6,7 @@ KG-QG 图谱自进化带来的高质量问题生成
 
 # 整个文章的pipeline如下：
 
-![Figure1](assets/Figure1-20251215200658-tv5zhlu.png)
+![Figure1](Picture/Figure1-20251215200658-tv5zhlu.png)
 
 ## 🚩技术路线
 
