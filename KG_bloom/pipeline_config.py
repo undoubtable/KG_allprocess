@@ -48,6 +48,7 @@ STEP8_DIR = OUT_ROOT / "Step8_output"
 PROMPT_PATH = Path(os.getenv("PROMPT_PATH", str(PROJECT_ROOT / "KG_tools" / "prompt.txt"))).resolve()
 STEP8_Q_TSV = STEP8_DIR / f"{LECTURE}_MCQ.tsv"
 PROMPT_PATH_BLOOM = Path(os.getenv("PROMPT_PATH_BLOOM", str(PROJECT_ROOT / "KG_code" / "prompt_bloom_same_knowledge.txt"))).resolve()
+
 #Step9
 STEP9_DIR = OUT_ROOT / "Step9_output"
 STEP9_EVAL_TSV = STEP9_DIR / f"{LECTURE}_MCQ_eval.tsv"
