@@ -46,10 +46,17 @@ OUTPUT_Q_TSV = str(STEP8_Q_TSV)
 #   - 在系统环境变量里设置：GITEE_AI_API_KEY=你的key
 #   - 或者直接把 os.getenv(...) 替换成 "你的真实 key"，例如：
 #       api_key="DUxxxxxxxxxxxxxxxxxxxx"
+import yaml
+
+with open("config.yaml", "r", encoding="utf-8") as f:
+    config = yaml.safe_load(f)
+
+# ========== LLM 配置 ==========
+
 client = OpenAI(
     base_url="https://ai.gitee.com/v1",
-    api_key="DUQFR61KA8QLDVEQPGJKBXYSL2DXMPST1FM98Y1L",
-    default_headers={"X-Failover-Enabled":"true"},
+    api_key = config["api_key"],
+    default_headers={"X-Failover-Enabled": "true"},
 )
 
 # 模型名称：按你在 gitee 上真实可用的模型名称填写

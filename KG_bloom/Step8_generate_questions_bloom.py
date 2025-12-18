@@ -39,9 +39,16 @@ PROMPT_PATH = str(PROMPT_PATH_BLOOM)
 
 # ========== LLM 配置 ==========
 
+import yaml
+
+with open("config.yaml", "r", encoding="utf-8") as f:
+    config = yaml.safe_load(f)
+
+# ========== LLM 配置 ==========
+
 client = OpenAI(
     base_url="https://ai.gitee.com/v1",
-    api_key="DUQFR61KA8QLDVEQPGJKBXYSL2DXMPST1FM98Y1L",
+    api_key = config["api_key"],
     default_headers={"X-Failover-Enabled": "true"},
 )
 
