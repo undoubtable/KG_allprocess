@@ -49,8 +49,11 @@ KG-QG 图谱自进化带来的高质量问题生成，目前只是一个想法�
 GitHub代码地址：[https://github.com/undoubtable/KG_allprocess.git](https://github.com/undoubtable/KG_allprocess.git)
 
 主要文件夹位置：
+
 [KG_tools](/KG_tools)               Here, you can run the auto code.
+
 [Output](/Output)                   Here, you can see what you output.
+
 [PDF_files](/PDF_files)             Here, you can inpput your PDF files.
 
 
