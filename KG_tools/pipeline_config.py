@@ -43,10 +43,12 @@ STEP45_EDGES_TSV = STEP45_DIR / f"{LECTURE}_KG_edges.tsv"
 
 # Step5
 STEP5_DIR = OUT_ROOT / "Step5_output"
+STEP5_OUTPUT_DIR = STEP5_DIR / "Figures"
 STEP5_GLOBAL_NODES = STEP5_DIR / f"global_{LECTURE}_KG_edges.tsv"
 STEP5_GLOBAL_EDGES = STEP5_DIR / f"global_{LECTURE}_KG_edges.tsv"
 
 # Step6
+
 #Step7
 STEP7_DIR = OUT_ROOT / "Step7_output"
 STEP7_KG_QUALITY_CSV = STEP7_DIR / f"{LECTURE}_KG_quality.csv"
