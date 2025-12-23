@@ -27,6 +27,10 @@ STEP2_SENT_TSV = STEP2_DIR / f"{LECTURE}_句子列表.tsv"
 STEP3_DIR = OUT_ROOT / "Step3_output"
 STEP3_ENT_TSV  = STEP3_DIR / f"{LECTURE}_实体列表.tsv"
 
+#Step3.5
+STEP35_DIR = OUT_ROOT / "Step3.5_output"
+STEP35_TRUTH_ENT_TSV  = STEP35_DIR / f"{LECTURE}_truth_实体列表.tsv"
+
 #Step4
 STEP4_DIR = OUT_ROOT / "Step4_output"
 STEP4_NODES_TSV = STEP4_DIR / f"{LECTURE}_KG_nodes.tsv"
