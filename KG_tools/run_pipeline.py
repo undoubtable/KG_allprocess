@@ -35,10 +35,14 @@ PYTHON_EXE = sys.executable   # 当前 Python 解释器
 BASE_DIR = Path(__file__).parent  # KG_code 目录
 
 STEPS = [
-    "Step1_pdf_to_text.py",
-    "Step2_ocr_text_to_sentences.py",
-    "Step3_extract_entities_simple.py",
-    "Step4_extract_relations_simple.py",
+    "Step1_pdf_to_text.py", # PDF 转 OCR 文本
+    "Step2_ocr_text_to_sentences.py", # OCR 文本 转 句子列表
+    "Step3_extract_entities_llm.py", # 句子列表 转 实体列表
+    "Step4_extract_relations_llm.py", # 实体列表 转 KG（节点+边）
+
+    "Step3.5_extract_entities_truth.py",# 使用实体真值表修正实体列表
+    "Step4.5_extract_relations_truth.py",# 使用关系真值表修正关系列表
+    
     "Step5_build_kg.py",
     # "Step6_load_to_neo4j.py",   # ⚠ 如不想每次都写 Neo4j，可注释
     "Step7_evaluate_kg_new.py",
