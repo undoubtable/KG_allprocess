@@ -6,7 +6,7 @@ import os
 PROJECT_ROOT = Path(os.getenv("KG_PROJECT_ROOT", r"D:\Desktop\KG_allprocess")).resolve()
 
 # 输入 PDF 文件（支持命令行/环境变量覆盖）
-PDF_PATH = Path(os.getenv("KG_PDF_PATH", str(PROJECT_ROOT / "PDF_files" / "第一讲.pdf"))).resolve()
+PDF_PATH = Path(os.getenv("KG_PDF_PATH", str(PROJECT_ROOT / "PDF_files" / "test1.pdf"))).resolve()
 
 # 讲义名（用于输出文件前缀）
 LECTURE = os.getenv("KG_LECTURE", PDF_PATH.stem)  # 默认用pdf文件名当讲义名
