@@ -48,7 +48,7 @@ client = OpenAI(
 )
 
 # LLM 模型名（用于评分）
-CHAT_MODEL = "Qwen3-32B"  # 按你在 Gitee 上实际可用的模型名来
+CHAT_MODEL = "DeepSeek-R1"  # 按你在 Gitee 上实际可用的模型名来
 
 
 # ================== 工具函数 ==================

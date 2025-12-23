@@ -60,8 +60,7 @@ client = OpenAI(
 )
 
 # 模型名称：按你在 gitee 上真实可用的模型名称填写
-MODEL_NAME = "DeepSeek-R1"  # TODO: 如有需要可以修改成其他模型
-
+MODEL_NAME = "DeepSeek-V3"  # TODO: 如有需要可以修改成其他模型
 
 # ========== 生成策略参数 ==========
 
