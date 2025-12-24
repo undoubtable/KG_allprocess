@@ -44,15 +44,14 @@ STEPS = [
     "Step5_plot_KG.py",
     # "Step6_load_to_neo4j.py",   # ⚠ 如不想每次都写 Neo4j，可注释
     "Step7_evaluate_kg_llm.py",
-
-    "Step8_generate_questions_simple.py",
-    "Step9_evaluate_questions.py",
-    "Step10_edit_questions.py",
-    "Step11_generate_kg_update_suggestions.py",
-    "Step12_apply_kg_updates.py",
-    "Step13_evaluate_kg_new.py",
-    "Step14_generate_questions_simple.py",
-    "Step15_evaluate_questions.py"
+    "Step8_generate_questions_llm.py",
+    "Step9_evaluate_QG_llm.py",
+    "Step10_edit_question_llm.py",
+    "Step11_KG_update_suggestions.py",
+    "Step12_apply_KG_update.py",
+    "Step13_evaluate_newKG_llm.py",
+    "Step14_generate_questions_llm_again.py",
+    "Step15_evaluate_QG_llm_again.py"
 ]
 
 
