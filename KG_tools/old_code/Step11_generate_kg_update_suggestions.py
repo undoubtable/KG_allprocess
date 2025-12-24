@@ -1,13 +1,13 @@
 import csv
 import os
 import re
-from pipeline_config import  STEP4_EDGES_TSV, STEP4_NODES_TSV, STEP10_Q_REVISED_TSV, STEP11_UPDATE_TSV 
+from pipeline_config import  STEP45_EDGES_TSV, STEP45_NODES_TSV, STEP10_Q_REVISED_TSV, STEP11_UPDATE_TSV 
 
 # ======== 配置：改成你自己的路径 ========
 # NODES_TSV = r"D:\Desktop\KG_allprocess\KG_files\Output_files\Step4_output\第一讲_KG_nodes.tsv"
 # EDGES_TSV = r"D:\Desktop\KG_allprocess\KG_files\Output_files\Step4_output\第一讲_KG_edges.tsv"
-NODES_TSV = str(STEP4_NODES_TSV)
-EDGES_TSV = str(STEP4_EDGES_TSV)
+NODES_TSV = str(STEP45_NODES_TSV)
+EDGES_TSV = str(STEP45_EDGES_TSV)
 # 这里要填【已经修正过问题】的 TSV
 # 如果你现在用的是 Step10_edit_questions.py，那就保持下面这样；
 # 如果你改用 Step10_auto_improve_mcq.py，就改成对应的输出路径。
