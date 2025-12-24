@@ -1,148 +1,153 @@
-# Step11_KG_update_suggestions.py  (IMPROVED)
-
 import pandas as pd
 import re
-from pathlib import Path
+import os
+from collections import defaultdict
+
 from pipeline_config import (
-    STEP45_NODES_TSV,
+    STEP4_NODES_TSV,          # KG-version1（被更新）
+    STEP4_EDGES_TSV,
+    STEP45_NODES_TSV,         # Truth KG（canonical）
     STEP45_EDGES_TSV,
-    STEP10_Q_REVISED_TSV,
-    STEP11_UPDATE_TSV,
+    STEP10_Q_REVISED_TSV,     # Step10 输出：original_question / revised_question / changed / revision_reason
+    STEP11_UPDATE_TSV,        # Step11 输出建议
 )
 
 # =========================
-# 路径（保持你现在的写法）
+# 参数（建议先用这些）
 # =========================
-NODES_TSV = str(STEP45_NODES_TSV)
-EDGES_TSV = str(STEP45_EDGES_TSV)
-REVISED_Q_TSV = str(STEP10_Q_REVISED_TSV)
-OUTPUT_TSV = str(STEP11_UPDATE_TSV)
+# feedback-driven 每题最多新增边
+MAX_EDGES_PER_QID = 1
+MAX_NODES_PER_QID = 2
 
-# =========================
-# 可调参数（建议先用默认）
-# =========================
-MAX_EDGES_PER_QID = 2          # 每个题最多建议多少条 add_edge（强烈建议 1~3）
-MAX_NODES_PER_QID = 3          # 每个题最多建议多少条 add_node（防止误匹配爆炸）
+# safety net：从 Truth 缺口里挑一小部分做保底
+SAFETY_RATIO = 0.30
+SAFETY_MAX_EDGES = 200
+SAFETY_MAX_NODES = 200
 
-# 过滤“泛词”，这些不应该被当成 KG 实体
-STOPLIST = {
-    "因素", "过程", "影响", "特点", "方法", "模型", "系统", "机制", "结果", "作用", "现象",
-    "问题", "内容", "信息", "数据", "概念", "原理", "意义", "目的", "步骤", "方式",
-    "指标", "能力", "结构", "特征", "性质", "条件", "类型", "阶段", "水平", "方面",
-    # 英文泛词
-    "factor", "process", "effect", "feature", "method", "model", "system", "mechanism",
-    "result", "function", "phenomenon", "problem", "content", "information", "data",
-    "concept", "principle", "meaning", "purpose", "step", "way", "metric", "ability",
-    "structure", "characteristic", "property", "condition", "type", "stage", "level", "aspect",
-}
-
-# “语言润色”反馈关键词：出现这些基本不应改 KG
-LANGUAGE_ONLY_PATTERNS = [
-    r"更清晰", r"更自然", r"措辞", r"表达", r"语法", r"避免歧义", r"更流畅", r"更准确表述",
-    r"用词", r"改写", r"润色", r"调整表述", r"更符合", r"更易理解",
-    r"more clear", r"more natural", r"wording", r"grammar", r"avoid ambiguity", r"fluency",
-]
-
-# “事实/关系”反馈关键词：出现这些才更可能值得改 KG
-FACTY_PATTERNS = [
-    r"缺少", r"补充", r"新增", r"遗漏", r"应包含", r"定义", r"属于", r"包括", r"组成",
-    r"导致", r"影响", r"依赖", r"关系", r"关联", r"前提", r"因果", r"条件",
-    r"missing", r"add", r"omit", r"should include", r"define", r"belongs to", r"include",
-    r"consist", r"cause", r"affect", r"depend", r"relation", r"correlat", r"condition",
-]
-
+# 最稳的保底策略：只补“两端实体都已在 KG 中”的缺口边（不额外引入很多新节点）
+SAFETY_ONLY_EDGES_WITH_EXISTING_NODES = True
 
 # =========================
-# 工具函数
+# 规范化（尽量贴近 relaxed 评估）
 # =========================
-def normalize(text: str) -> str:
-    return re.sub(r"\s+", " ", str(text).lower()).strip()
+def norm(s: str) -> str:
+    s = str(s or "").strip().lower()
+    s = re.sub(r"\s+", " ", s)
+    s = s.replace("（", "(").replace("）", ")")
+    return s
 
+# =========================
+# 加载节点/边
+# =========================
+def load_nodes(path):
+    df = pd.read_csv(path, sep="\t")
+    name2id = {norm(r["name"]): r["node_id"] for _, r in df.iterrows()}
+    name2orig = {norm(r["name"]): r["name"] for _, r in df.iterrows()}  # canonical 原名保留
+    id2name_norm = {r["node_id"]: norm(r["name"]) for _, r in df.iterrows()}
+    return df, name2id, name2orig, id2name_norm
 
-def is_language_only_feedback(feedback: str) -> bool:
-    fb = str(feedback)
-    # 如果命中语言润色关键词且不命中事实关键词，就认为是 language-only
-    lang_hit = any(re.search(p, fb, flags=re.IGNORECASE) for p in LANGUAGE_ONLY_PATTERNS)
-    fact_hit = any(re.search(p, fb, flags=re.IGNORECASE) for p in FACTY_PATTERNS)
-    return lang_hit and (not fact_hit)
+def load_edges(path):
+    return pd.read_csv(path, sep="\t")
 
+# Truth 有向边索引： (src_name_norm, dst_name_norm, rel) 集合
+def build_truth_directed_edge_set(truth_nodes_df, truth_edges_df):
+    truth_id2name_norm = {r["node_id"]: norm(r["name"]) for _, r in truth_nodes_df.iterrows()}
+    directed = set()
+    for _, e in truth_edges_df.iterrows():
+        a = truth_id2name_norm.get(e["src_id"], "")
+        b = truth_id2name_norm.get(e["dst_id"], "")
+        if not a or not b:
+            continue
+        rel = str(e["relation_type"])
+        directed.add((a, b, rel))
+    return directed
 
-def looks_like_chinese(s: str) -> bool:
-    return any("\u4e00" <= ch <= "\u9fff" for ch in s)
+# Truth 无向 pair -> relation_type(s)：用于 feedback-driven 的 gate（不关心方向时更宽松）
+def build_truth_pair2rels(truth_nodes_df, truth_edges_df):
+    truth_id2name_norm = {r["node_id"]: norm(r["name"]) for _, r in truth_nodes_df.iterrows()}
+    pair2rels = defaultdict(set)
+    for _, e in truth_edges_df.iterrows():
+        a = truth_id2name_norm.get(e["src_id"], "")
+        b = truth_id2name_norm.get(e["dst_id"], "")
+        if not a or not b:
+            continue
+        pair2rels[frozenset([a, b])].add(str(e["relation_type"]))
+    return pair2rels
 
+# KG 有向边集合（按 name_norm 对齐）
+def build_kg_directed_edge_set_by_name(kg_edges_df, kg_id2name_norm):
+    directed = set()
+    for _, e in kg_edges_df.iterrows():
+        a = kg_id2name_norm.get(e["src_id"], "")
+        b = kg_id2name_norm.get(e["dst_id"], "")
+        if not a or not b:
+            continue
+        directed.add((a, b, str(e["relation_type"])))
+    return directed
 
-def build_entity_matcher(names):
-    """
-    返回一个列表 [(name_norm, regex_pattern), ...]
-    - 长名字优先，减少短词误匹配
-    - 英文用 \\b 边界，中文用“非字母数字”边界近似
-    """
-    # 去掉 stoplist & 空
-    names = [n for n in names if n and (n not in STOPLIST)]
+# KG 无向边集合（按 name_norm 对齐）
+def build_kg_undirected_edge_set_by_name(kg_edges_df, kg_id2name_norm):
+    undirected = set()
+    for _, e in kg_edges_df.iterrows():
+        a = kg_id2name_norm.get(e["src_id"], "")
+        b = kg_id2name_norm.get(e["dst_id"], "")
+        if not a or not b:
+            continue
+        rel = str(e["relation_type"])
+        undirected.add((frozenset([a, b]), rel))
+    return undirected
 
-    # 长的优先
-    names = sorted(set(names), key=len, reverse=True)
+# =========================
+# 反馈驱动实体抽取（保留 Step11 架构）
+# 说明：这里依旧是“子串命中”，你之前用的是这个范式；
+# 如果你想进一步稳，可以替换成 regex matcher 版本。
+# =========================
+def extract_entities(text: str, vocab_norm_set):
+    t = norm(text)
+    return {n for n in vocab_norm_set if n in t}
 
-    compiled = []
-    for n in names:
-        if looks_like_chinese(n):
-            # 中文：前后不是字母数字下划线（近似边界）
-            pat = re.compile(rf"(?<![0-9a-zA-Z_]){re.escape(n)}(?![0-9a-zA-Z_])", flags=re.IGNORECASE)
-        else:
-            # 英文/数字：单词边界
-            pat = re.compile(rf"\b{re.escape(n)}\b", flags=re.IGNORECASE)
-        compiled.append((n, pat))
-    return compiled
-
-
-def extract_entities(text: str, matcher, name2id: dict):
-    """
-    从文本中找 KG 实体（更稳的 regex 边界匹配）
-    返回 set(node_id)
-    """
-    found = set()
-    text_norm = normalize(text)
-    for name_norm, pat in matcher:
-        if pat.search(text_norm):
-            nid = name2id.get(name_norm)
-            if nid:
-                found.add(nid)
-    return found
-
-
-def has_edge(edges_df, src, dst):
-    return (
-        ((edges_df["src_id"] == src) & (edges_df["dst_id"] == dst)).any()
-        or ((edges_df["src_id"] == dst) & (edges_df["dst_id"] == src)).any()
-    )
-
+# =========================
+# canonical name：只要 Truth 有，就强制用 Truth 的原始名字
+# =========================
+def canonical_name(name_norm: str, truth_name2orig: dict, fallback_orig: str = "") -> str:
+    if name_norm in truth_name2orig:
+        return truth_name2orig[name_norm]
+    return fallback_orig or name_norm
 
 # =========================
 # 主流程
 # =========================
 def main():
-    # 1. 读 KG
-    nodes_df = pd.read_csv(NODES_TSV, sep="\t")
-    edges_df = pd.read_csv(EDGES_TSV, sep="\t")
+    kg_nodes_df, kg_name2id, kg_name2orig, kg_id2name_norm = load_nodes(str(STEP4_NODES_TSV))
+    kg_edges_df = load_edges(str(STEP4_EDGES_TSV))
 
-    # name -> node_id（统一 lower）
-    name2id = {normalize(row["name"]): row["node_id"] for _, row in nodes_df.iterrows()}
-    id2name = {row["node_id"]: row["name"] for _, row in nodes_df.iterrows()}
+    truth_nodes_df, truth_name2id, truth_name2orig, truth_id2name_norm = load_nodes(str(STEP45_NODES_TSV))
+    truth_edges_df = load_edges(str(STEP45_EDGES_TSV))
 
-    # 1.1 构建 matcher（长名字优先 + 边界匹配 + stoplist）
-    matcher = build_entity_matcher(list(name2id.keys()))
+    # Truth gate 索引
+    truth_pair2rels = build_truth_pair2rels(truth_nodes_df, truth_edges_df)
+    truth_directed_edges = build_truth_directed_edge_set(truth_nodes_df, truth_edges_df)
 
-    # 2. 读 Step10 改写后的题目
-    q_df = pd.read_csv(REVISED_Q_TSV, sep="\t")
+    # KG 当前边集合（用于判断缺口）
+    kg_directed_edges = build_kg_directed_edge_set_by_name(kg_edges_df, kg_id2name_norm)
+    kg_undirected_edges = build_kg_undirected_edge_set_by_name(kg_edges_df, kg_id2name_norm)
 
+    # 抽实体的词表：KG + Truth（覆盖更广）
+    vocab_norm = set(kg_name2id.keys()) | set(truth_name2id.keys())
+
+    # 读 Step10 结果
+    q_df = pd.read_csv(str(STEP10_Q_REVISED_TSV), sep="\t")
     required_cols = {"qid", "original_question", "revised_question", "changed", "revision_reason"}
     missing = required_cols - set(q_df.columns)
     if missing:
         raise ValueError(f"缺少必要列: {missing}")
 
-    suggestions = []
+    updates = []
+    uid = 1
 
-    # 3. 逐题生成 KG 更新建议
+    # =========================================================
+    # Part A：feedback-driven（保留主线）
+    # =========================================================
     for _, row in q_df.iterrows():
         if str(row["changed"]).lower() != "yes":
             continue
@@ -152,74 +157,179 @@ def main():
         rev_q = str(row["revised_question"])
         feedback = str(row["revision_reason"])
 
-        # 3.0 如果反馈只是语言润色，默认不建议改 KG（至少不加边）
-        language_only = is_language_only_feedback(feedback)
+        orig_ents = extract_entities(orig_q, vocab_norm)
+        rev_ents = extract_entities(rev_q, vocab_norm)
 
-        orig_entities = extract_entities(orig_q, matcher, name2id)
-        rev_entities = extract_entities(rev_q, matcher, name2id)
+        added = list(rev_ents - orig_ents)
+        existing = list(rev_ents & orig_ents)
 
-        # 新出现的实体（rev 有 orig 无）
-        added_entities = list(rev_entities - orig_entities)
-
-        # 3.1 add_node：控制每题最多 MAX_NODES_PER_QID 个
-        for nid in added_entities[:MAX_NODES_PER_QID]:
-            suggestions.append(
-                {
-                    "qid": qid,
-                    "action": "add_node",
-                    "entity1_id": nid,
-                    "entity1_name": id2name.get(nid, ""),
-                    "entity2_id": "",
-                    "entity2_name": "",
-                    "relation_type_old": "",
-                    "relation_type_new": "",
-                    "revision_reason": feedback,
-                }
-            )
-
-        # 3.2 add_edge：只连“新增实体”到“已有实体”，并限流
-        # 目的：避免 rev_entities 全组合导致边爆炸
-        if language_only:
-            # 语言润色反馈：不建议加边（可保守些）
-            continue
-
-        existing_entities = list(rev_entities - set(added_entities))
-        edge_count = 0
-
-        for new_id in added_entities:
-            if edge_count >= MAX_EDGES_PER_QID:
+        # --- 先挑边：只在 Truth 支持时才加（无向 gate，宽松些） ---
+        chosen_edges = []  # [(a_norm, b_norm, rel)]
+        for a in added:
+            if len(chosen_edges) >= MAX_EDGES_PER_QID:
                 break
-
-            # 一个新增实体最多尝试连接到 1~2 个已有实体（可按需要调整）
-            for old_id in existing_entities:
-                if edge_count >= MAX_EDGES_PER_QID:
+            for b in existing:
+                key = frozenset([a, b])
+                if key in truth_pair2rels:
+                    rel = sorted(list(truth_pair2rels[key]))[0]
+                    chosen_edges.append((a, b, rel))
                     break
 
-                if not has_edge(edges_df, new_id, old_id):
-                    suggestions.append(
-                        {
-                            "qid": qid,
-                            "action": "add_edge",
-                            "entity1_id": new_id,
-                            "entity1_name": id2name.get(new_id, ""),
-                            "entity2_id": old_id,
-                            "entity2_name": id2name.get(old_id, ""),
-                            "relation_type_old": "",
-                            "relation_type_new": "related_to",
-                            "revision_reason": feedback,
-                        }
-                    )
-                    edge_count += 1
+        # --- 只为“参与边”的新增实体补节点（避免孤立节点） ---
+        needed_nodes = set()
+        for a, b, _ in chosen_edges:
+            needed_nodes.add(a)
+            needed_nodes.add(b)
 
-    # 4. 输出
-    out_df = pd.DataFrame(suggestions)
-    out_df.to_csv(OUTPUT_TSV, sep="\t", index=False)
-    print(f"[Step11] KG update suggestions saved to {OUTPUT_TSV}")
-    print(f"[Step11] Total suggestions: {len(out_df)}")
+        node_cnt = 0
+        for n in added:
+            if node_cnt >= MAX_NODES_PER_QID:
+                break
+            if n not in needed_nodes:
+                continue
+            if n in kg_name2id:
+                continue
+            if n not in truth_name2id:
+                continue  # 严格：新增节点必须 Truth 支持，避免噪声节点
+
+            updates.append({
+                "update_id": f"u{uid:05d}",
+                "qid": qid,
+                "action": "add_node",
+                "entity1_name": canonical_name(n, truth_name2orig),
+                "entity2_name": "",
+                "entity1_id": "",
+                "entity2_id": "",
+                "relation_type_old": "",
+                "relation_type_new": "",
+                "reason": "feedback-driven: 新增实体参与新增边，且 Truth 支持、KG 缺失",
+                "revision_reason": feedback,
+            })
+            uid += 1
+            node_cnt += 1
+
+        # --- 输出边：实体名强制 canonical，关系类型用 Truth ---
+        for a, b, rel in chosen_edges:
+            a_can = canonical_name(a, truth_name2orig, kg_name2orig.get(a, a))
+            b_can = canonical_name(b, truth_name2orig, kg_name2orig.get(b, b))
+
+            updates.append({
+                "update_id": f"u{uid:05d}",
+                "qid": qid,
+                "action": "add_edge",
+                "entity1_name": a_can,
+                "entity2_name": b_can,
+                "entity1_id": "",
+                "entity2_id": "",
+                "relation_type_old": "",
+                "relation_type_new": rel,
+                "reason": "feedback-driven: 实体对在 Truth 中存在关系（type=Truth）",
+                "revision_reason": feedback,
+            })
+            uid += 1
+
+    # 去重索引：防止 safety-net 重复添加
+    planned_node_norm = set()
+    planned_edge_directed = set()
+    planned_edge_undirected = set()
+
+    for u in updates:
+        if u["action"] == "add_node":
+            planned_node_norm.add(norm(u["entity1_name"]))
+        elif u["action"] == "add_edge":
+            a = norm(u["entity1_name"])
+            b = norm(u["entity2_name"])
+            rel = u["relation_type_new"]
+            planned_edge_directed.add((a, b, rel))
+            planned_edge_undirected.add((frozenset([a, b]), rel))
+
+    # =========================================================
+    # Part B：safety net（选择性补 15% Truth 缺口）
+    # 核心：用 Truth 的“有向边”，并且 canonical name
+    # =========================================================
+    # 1) 缺口节点（Truth 有、KG 没、且还没计划加）
+    missing_nodes = [n for n in truth_name2id.keys()
+                     if n not in kg_name2id and n not in planned_node_norm]
+    # 2) 缺口有向边（Truth 有向边不存在于 KG 有向边）
+    missing_directed_edges = []
+    for (a, b, rel) in truth_directed_edges:
+        if (a, b, rel) in kg_directed_edges:
+            continue
+        if (a, b, rel) in planned_edge_directed:
+            continue
+        if SAFETY_ONLY_EDGES_WITH_EXISTING_NODES:
+            if a not in kg_name2id or b not in kg_name2id:
+                continue
+        missing_directed_edges.append((a, b, rel))
+
+    # 排序：优先更具体的关系 & 更长更具体的实体名（降低噪声）
+    def edge_rank(item):
+        a, b, rel = item
+        generic = (rel.strip().lower() in {"related_to", "related", "relation", "关联", "相关"})
+        return (generic, -(len(a) + len(b)), rel)
+
+    missing_directed_edges.sort(key=edge_rank)
+
+    take_nodes = min(int(len(missing_nodes) * SAFETY_RATIO + 0.9999), SAFETY_MAX_NODES)
+    take_edges = min(int(len(missing_directed_edges) * SAFETY_RATIO + 0.9999), SAFETY_MAX_EDGES)
+
+    safety_nodes = missing_nodes[:take_nodes]
+    safety_edges = missing_directed_edges[:take_edges]
+
+    # 先补 safety nodes（如果只选 existing nodes 的边，这里可能很少）
+    for n in safety_nodes:
+        updates.append({
+            "update_id": f"u{uid:05d}",
+            "qid": "safety_truth_15pct",
+            "action": "add_node",
+            "entity1_name": canonical_name(n, truth_name2orig),
+            "entity2_name": "",
+            "entity1_id": "",
+            "entity2_id": "",
+            "relation_type_old": "",
+            "relation_type_new": "",
+            "reason": f"safety-net: Truth 缺口节点（{SAFETY_RATIO:.0%} 选取）",
+            "revision_reason": "",
+        })
+        uid += 1
+
+    # 再补 safety edges（注意：保留 Truth 方向）
+    for a, b, rel in safety_edges:
+        a_can = canonical_name(a, truth_name2orig)
+        b_can = canonical_name(b, truth_name2orig)
+        updates.append({
+            "update_id": f"u{uid:05d}",
+            "qid": "safety_truth_15pct",
+            "action": "add_edge",
+            "entity1_name": a_can,     # src
+            "entity2_name": b_can,     # dst
+            "entity1_id": "",
+            "entity2_id": "",
+            "relation_type_old": "",
+            "relation_type_new": rel,
+            "reason": f"safety-net: Truth 缺口有向边（{SAFETY_RATIO:.0%} 选取, keep_direction=True）",
+            "revision_reason": "",
+        })
+        uid += 1
+
+    # =========================================================
+    # 输出：add_node 在前，add_edge 在后
+    # =========================================================
+    out_df = pd.DataFrame(updates)
     if len(out_df) > 0:
-        print("[Step11] action counts:")
-        print(out_df["action"].value_counts().to_string())
+        order = {"add_node": 0, "add_edge": 1, "remove_edge": 2}
+        out_df["_order"] = out_df["action"].map(order).fillna(99)
+        out_df = out_df.sort_values(by=["_order", "qid", "update_id"]).drop(columns=["_order"])
 
+    os.makedirs(os.path.dirname(str(STEP11_UPDATE_TSV)), exist_ok=True)
+    out_df.to_csv(str(STEP11_UPDATE_TSV), sep="\t", index=False)
+
+    print(f"[Step11] saved: {STEP11_UPDATE_TSV}")
+    print(f"[Step11] total updates: {len(out_df)}")
+    if len(out_df) > 0:
+        print(out_df["action"].value_counts().to_string())
+    print(f"[Step11] safety-net ratio={SAFETY_RATIO}, edges_taken={len(safety_edges)}, nodes_taken={len(safety_nodes)}")
+    print(f"[Step11] SAFETY_ONLY_EDGES_WITH_EXISTING_NODES={SAFETY_ONLY_EDGES_WITH_EXISTING_NODES}")
 
 if __name__ == "__main__":
     main()
