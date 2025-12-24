@@ -1,0 +1,33 @@
+{
+  "timestamp": "2025-12-24T13:16:30.330001",
+  "input_questions_tsv": "D:\\Desktop\\KG_allprocess\\Output\\Step8_output\\test1_MCQ.tsv",
+  "output_eval_tsv": "D:\\Desktop\\KG_allprocess\\Output\\Step9_output\\test1_MCQ_eval.tsv",
+  "kg_nodes_tsv": "D:\\Desktop\\KG_allprocess\\Output\\Step4_output\\test1_KG_nodes.tsv",
+  "kg_edges_tsv": "D:\\Desktop\\KG_allprocess\\Output\\Step4_output\\test1_KG_edges.tsv",
+  "num_questions": 50,
+  "warnings": [
+    "题目 TSV 未包含 fact/kg_fact 列：C/D 将退化为 best-effort（不保证100%可审计）。"
+  ],
+  "target_entity_dist": {
+    "2": 0.35,
+    "3": 0.45,
+    "4": 0.2
+  },
+  "target_rel_dist": {
+    "1": 1.0
+  },
+  "suite_entity_distribution_score": 32.0,
+  "suite_relation_distribution_score": 0.0,
+  "weights": {
+    "A": 0.25,
+    "B": 0.25,
+    "C": 0.25,
+    "D": 0.25
+  },
+  "avg_A": 26.6,
+  "avg_B": 75.5,
+  "avg_C": 96.0,
+  "avg_D": 50.0,
+  "avg_Q_total": 62.02,
+  "suggested_suite_total_with_distribution": 43.61
+}

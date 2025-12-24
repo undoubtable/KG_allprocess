@@ -36,6 +36,10 @@ from openai import OpenAI
 from pipeline_config import STEP9_EVAL_TSV, STEP10_Q_REVISED_TSV
 
 # =============== 配置区域 ===============
+import yaml
+
+with open("config.yaml", "r", encoding="utf-8") as f:
+    config = yaml.safe_load(f)
 
 # Step9 输出的评估结果 TSV（输入）
 # INPUT_EVAL_TSV = r"D:\Desktop\KG_allprocess\KG_files\Output_files\Step9_output\第一讲_MCQ_eval.tsv"
@@ -49,12 +53,11 @@ THRESHOLD_Q = 0.90
 # Gitee + DeepSeek 客户端
 client = OpenAI(
     base_url="https://ai.gitee.com/v1",
-    api_key="DUQFR61KA8QLDVEQPGJKBXYSL2DXMPST1FM98Y1L",
+    api_key = config["api_key"],
     default_headers={"X-Failover-Enabled":"true"},
 )
 
-CHAT_MODEL = "DeepSeek-R1"  # 按你在 Gitee 上真实可用的聊天模型名称修改
-
+MODEL_NAME = "DeepSeek-R1"  # 按你在 Gitee 上真实可用的聊天模型名称修改
 
 # =============== 工具函数 ===============
 
@@ -160,7 +163,7 @@ D. {option_d}
 """.strip()
 
     resp = client.chat.completions.create(
-        model=CHAT_MODEL,
+        model=MODEL_NAME,
         messages=[
             {
                 "role": "system",

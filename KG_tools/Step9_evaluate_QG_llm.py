@@ -2,27 +2,18 @@
 # -*- coding: utf-8 -*-
 
 """
-Step9 — Q-version1 评估（KG 驱动 + 更强模型评估连贯性）
+Step9 — Q-version1 评估（KG 驱动 + DeepSeek-R1 评估连贯性）
 
-对 Step8 输出题目 TSV 做四项指标评估（百分制 0~100）：
-A) entity_relation_coverage_score：题干+选项中包含的实体/关系数量（并支持“题套分布”得分到 100%）
-B) coherence_score：语义连贯性（交给更强模型打分 0~100）
-C) entity_alignment_score：题干与选项实体对应正确率（尽量做 100% 程序校验）
-D) relation_correctness_score：正确答案实体关系正确率（尽量做 100% 程序校验）
-
-输入：
-- Step8 输出 TSV（必需列：qid, question, option_a/b/c/d, answer）
-- KG nodes.tsv / edges.tsv（用于实体字典与关系校验）
-- 可选列：context、fact（或 kg_fact）：
-  * 若提供 fact/kg_fact 且能解析 triple，则 C/D 可做到严格校验；
-  * 否则 C/D 将退化为 best-effort（会在 summary warnings 说明）。
+✅ v2 改动要点：
+1) KG 路径优先从 pipeline_config.py 读取 KG_NODES_TSV / KG_EDGES_TSV
+   - 若未定义，则 fallback 到 STEP4_NODES_TSV / STEP4_EDGES_TSV（保证可运行）
+2) Step8 现在输出 kg_fact/context 后：
+   - C（实体对齐）与 D（关系正确）可以严格审计（不再 best-effort）
+3) B（连贯性）LLM 调用加 try/except：失败不崩溃，默认给 60 分并写 warning
 
 输出：
-- Step9 输出 TSV：附加四项分数、总分、匹配实体等
-- summary JSON：题套分布得分、均分、警告
-
-⚠️注意：
-- 模型调用与文件导入按照你现有 Step9 格式：OpenAI(base_url=..., api_key=..., headers...) + pipeline_config 常量。
+- Step9_EVAL_TSV：逐题 A/B/C/D + Q_total
+- q_version1_eval_summary.json：整套分布得分 + 均分 + warnings
 """
 
 import csv
@@ -34,51 +25,50 @@ from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple, Set
 
 from openai import OpenAI
-from pipeline_config import (
-    STEP4_EDGES_TSV,
-    STEP4_NODES_TSV,
-    STEP9_EVAL_TSV,
-    STEP8_Q_TSV,
-)
+import yaml
 
-# ================== 配置区域（按你项目习惯改这里即可） ==================
+from pipeline_config import STEP9_EVAL_TSV, STEP9_EVAL_JSON, STEP8_Q_TSV
+from pipeline_config import STEP4_NODES_TSV, STEP4_EDGES_TSV
 
-# Step8 输出 TSV
+# ✅ 尝试从 pipeline_config 读取 KG_NODES_TSV / KG_EDGES_TSV（你加了更好；没加也不影响运行）
+try:
+    from pipeline_config import KG_NODES_TSV as _KG_NODES_TSV
+    from pipeline_config import KG_EDGES_TSV as _KG_EDGES_TSV
+except Exception:
+    _KG_NODES_TSV = STEP4_NODES_TSV
+    _KG_EDGES_TSV = STEP4_EDGES_TSV
+
 INPUT_Q_TSV = str(STEP8_Q_TSV)
-
-# Step9 输出评估 TSV
 OUTPUT_EVAL_TSV = str(STEP9_EVAL_TSV)
 
-# KG 文件（这里先写相对路径/绝对路径；也可改成 pipeline_config 常量）
-KG_NODES_TSV = str(STEP4_NODES_TSV)
-KG_EDGES_TSV = str(STEP4_EDGES_TSV)
+KG_NODES_TSV = str(_KG_NODES_TSV)
+KG_EDGES_TSV = str(_KG_EDGES_TSV)
 
-# 评估模型客户端（与你 Step8/Step9 同风格）
+# ========== LLM 配置 ==========
+with open("config.yaml", "r", encoding="utf-8") as f:
+    config = yaml.safe_load(f)
+
 client = OpenAI(
     base_url="https://ai.gitee.com/v1",
-    api_key="YOUR_API_KEY_HERE",
+    api_key=config["api_key"],
     default_headers={"X-Failover-Enabled": "true"},
 )
 
-# 用于评估（更强模型，按你实际可用模型名改）
-CHAT_MODEL = "DeepSeek-R1"  # 或者你在 Gitee 上对应的 deepseek-reasoner / 其他名称
+# ✅ 评估推荐用 R1 / reasoner
+MODEL_NAME = config.get("judge_model", "DeepSeek-R1")
 
-# Q-version1 总分权重（可按你需求调整）
+# ========== 权重与目标分布 ==========
 W_A = 0.25
 W_B = 0.25
 W_C = 0.25
 W_D = 0.25
 
-# 题套实体数分布目标（示例：2~4 个实体为主）
 TARGET_ENTITY_DIST = {2: 0.35, 3: 0.45, 4: 0.20}
-# 题套关系数分布目标（单边题一般=1）
 TARGET_REL_DIST = {1: 1.0}
-
-MIN_ENTITY_LEN = 2  # 实体字典匹配最短长度（避免“法”“人”等过短误匹配）
+MIN_ENTITY_LEN = 2
 
 
 # ================== KG 读取与索引 ==================
-
 def _norm_space(s: str) -> str:
     return re.sub(r"\s+", " ", (s or "").strip())
 
@@ -113,12 +103,11 @@ def _detect_edges_cols(header: List[str]) -> Tuple[str, str, str]:
 class KGIndex:
     def __init__(self):
         self.id2name: Dict[str, str] = {}
-        self.name2ids: Dict[str, Set[str]] = defaultdict(set)  # lower(name)->ids
-        self.edge_set: Set[Tuple[str, str, str]] = set()       # (src_id, rel, dst_id)
+        self.name2ids: Dict[str, Set[str]] = defaultdict(set)
+        self.edge_set: Set[Tuple[str, str, str]] = set()
 
 def load_kg(nodes_path: str, edges_path: str) -> KGIndex:
     kg = KGIndex()
-
     n_header, n_rows = _read_tsv(nodes_path)
     e_header, e_rows = _read_tsv(edges_path)
 
@@ -138,7 +127,6 @@ def load_kg(nodes_path: str, edges_path: str) -> KGIndex:
         if n_alias_col:
             aliases = (r.get(n_alias_col) or "").strip()
             if aliases:
-                # 支持多分隔符
                 seps = ["|", ",", "，", "；", ";"]
                 parts = None
                 for sep in seps:
@@ -162,13 +150,13 @@ def load_kg(nodes_path: str, edges_path: str) -> KGIndex:
 
 def build_entity_dict_names(kg: KGIndex, min_len: int = 2) -> List[str]:
     names = [n for n in kg.name2ids.keys() if len(n) >= min_len]
-    names.sort(key=len, reverse=True)  # 最长优先
+    names.sort(key=len, reverse=True)
     return names
 
 def extract_entities_by_dict(text: str, dict_names_lower: List[str]) -> List[str]:
     t = (text or "").lower()
     found = []
-    used = []  # spans
+    used = []
     for name in dict_names_lower:
         if name not in t:
             continue
@@ -182,7 +170,6 @@ def extract_entities_by_dict(text: str, dict_names_lower: List[str]) -> List[str
             if not overlap:
                 used.append((s, e))
                 found.append(name)
-    # unique
     seen = set()
     out = []
     for x in found:
@@ -194,7 +181,7 @@ def extract_entities_by_dict(text: str, dict_names_lower: List[str]) -> List[str
 def parse_kg_fact(text: str) -> Optional[Tuple[str, str, str]]:
     """
     支持：
-    - "src_id|rel|dst_id"
+    - "src_id|rel|dst_id" （推荐）
     - "src_name --rel--> dst_name"
     """
     s = (text or "").strip()
@@ -204,7 +191,6 @@ def parse_kg_fact(text: str) -> Optional[Tuple[str, str, str]]:
         parts = [p.strip() for p in s.split("|")]
         if len(parts) >= 3:
             return parts[0], parts[1], parts[2]
-    # arrow
     if "-->" in s and "--" in s:
         m = re.split(r"\s*--\s*", s, maxsplit=1)
         if len(m) == 2:
@@ -220,7 +206,6 @@ def parse_kg_fact(text: str) -> Optional[Tuple[str, str, str]]:
 
 
 # ================== 题目读取/写出 ==================
-
 def load_mcq(path: str) -> List[Dict[str, str]]:
     rows: List[Dict[str, str]] = []
     with open(path, "r", encoding="utf-8") as f:
@@ -244,12 +229,7 @@ def save_eval_rows(rows: List[Dict[str, Any]], path: str):
 
 
 # ================== 分布得分（题套级） ==================
-
 def suite_distribution_score(values: List[int], target_dist: Dict[int, float]) -> float:
-    """
-    L1 距离映射到 0~100：
-    score = (1 - 0.5 * sum(|p_i - q_i|) - extra_mass*0.5) * 100
-    """
     if not values:
         return 0.0
     cnt = Counter(values)
@@ -267,25 +247,17 @@ def suite_distribution_score(values: List[int], target_dist: Dict[int, float]) -
     return score * 100.0
 
 def per_question_A_score(ent_cnt: int, rel_cnt: int, ideal_ent: int = 3, ideal_rel: int = 1) -> float:
-    """
-    单题 A 分：实体数接近 ideal_ent，且关系数>=ideal_rel
-    """
     if ent_cnt <= 0:
         ent_score = 0.0
     else:
         dist = abs(ent_cnt - ideal_ent)
-        ent_score = max(0.0, 100.0 - dist * 20.0)  # 偏离每 +1 扣 20
-
+        ent_score = max(0.0, 100.0 - dist * 20.0)
     rel_score = 100.0 if rel_cnt >= ideal_rel else 0.0
     return 0.5 * ent_score + 0.5 * rel_score
 
 
-# ================== C / D 程序校验（尽量 100%） ==================
-
+# ================== C/D 严格校验 ==================
 def resolve_ids(kg: KGIndex, raw: str) -> Set[str]:
-    """
-    raw 可能是 node_id 也可能是 name/alias
-    """
     if not raw:
         return set()
     if raw in kg.id2name:
@@ -295,40 +267,32 @@ def resolve_ids(kg: KGIndex, raw: str) -> Set[str]:
 def score_C_entity_alignment(
     kg: KGIndex,
     dict_names_lower: List[str],
-    question: str,
     options: Dict[str, str],
     answer: str,
     fact_trip: Optional[Tuple[str, str, str]],
 ) -> float:
     """
-    C：题干与选项实体对应正确率（0~100）
-    - 若 fact_trip 可解析：检查正确选项中是否包含 dst（通过 KG 字典匹配到的 id 与 dst id 交集）
-    - 若无 fact_trip：best-effort（正确选项至少能匹配到 KG 实体）
+    有 fact_trip 时：正确选项实体必须匹配 dst（严格）
     """
+    if not fact_trip:
+        return 0.0
+
     ans = (answer or "").strip().upper()
     if ans not in options:
         m = re.search(r"\b([ABCD])\b", ans)
         ans = m.group(1) if m else ans
     correct_text = options.get(ans, "")
 
-    if not fact_trip:
-        # best-effort：正确选项是否能匹配到任何 KG 实体
-        c_ents = extract_entities_by_dict(correct_text, dict_names_lower)
-        return 100.0 if c_ents else 0.0
-
-    src_raw, rel_raw, dst_raw = fact_trip
+    _, _, dst_raw = fact_trip
     dst_ids = resolve_ids(kg, dst_raw)
 
-    # 从正确选项抽实体并转 id
     c_ents = extract_entities_by_dict(correct_text, dict_names_lower)
     c_ids = set()
     for e in c_ents:
         c_ids |= kg.name2ids.get(e.lower(), set())
 
     if not dst_ids:
-        # 无法解析 dst，退化处理
-        return 50.0
-
+        return 0.0
     return 100.0 if (dst_ids & c_ids) else 0.0
 
 def score_D_relation_correctness(
@@ -339,13 +303,11 @@ def score_D_relation_correctness(
     fact_trip: Optional[Tuple[str, str, str]],
 ) -> float:
     """
-    D：正确答案中实体之间关系正确率（0~100）
-    - 若 fact_trip 可解析：校验 KG 中是否存在对应 edge
-    - src/dst 支持 id 或 name/alias
-    - dst 从 “正确选项文本匹配到的实体” 与 “fact_trip 的 dst” 取交集（更严格）
+    有 fact_trip 时：校验 KG 中是否存在 (src, rel, dst)
+    dst 更严格：取 fact dst 与正确选项抽到实体的交集
     """
     if not fact_trip:
-        return 50.0
+        return 0.0
 
     ans = (answer or "").strip().upper()
     if ans not in options:
@@ -357,7 +319,6 @@ def score_D_relation_correctness(
     src_ids = resolve_ids(kg, src_raw)
     dst_ids_fact = resolve_ids(kg, dst_raw)
 
-    # dst 从正确选项抽
     c_ents = extract_entities_by_dict(correct_text, dict_names_lower)
     dst_ids_text = set()
     for e in c_ents:
@@ -371,7 +332,7 @@ def score_D_relation_correctness(
         dst_ids = dst_ids_fact or dst_ids_text
 
     if not src_ids or not dst_ids or not rel:
-        return 50.0
+        return 0.0
 
     for s in src_ids:
         for d in dst_ids:
@@ -380,17 +341,9 @@ def score_D_relation_correctness(
     return 0.0
 
 
-# ================== B：更强模型评估连贯性（0~100） ==================
-
+# ================== B：R1 评估连贯性（失败不崩溃） ==================
 def parse_percent_score(content: str, key: str, default: int = 60) -> int:
-    """
-    从 LLM 返回里解析 key 对应的 0~100 分数
-    期待 JSON：{"coherence_score": 87, ...}
-    """
-    result = default
     text = (content or "").strip()
-
-    # JSON 优先
     try:
         start = text.find("{")
         end = text.rfind("}")
@@ -398,48 +351,14 @@ def parse_percent_score(content: str, key: str, default: int = 60) -> int:
             data = json.loads(text[start:end + 1])
             if key in data:
                 v = int(data[key])
-                if 0 <= v <= 100:
-                    return v
+                return max(0, min(100, v))
     except Exception:
         pass
+    return default
 
-    # fallback：找数字
-    lowered = text.lower()
-    idx = lowered.find(key.lower())
-    if idx != -1:
-        tail = lowered[idx: idx + 80]
-        m = re.search(r"(\d{1,3})", tail)
-        if m:
-            v = int(m.group(1))
-            v = max(0, min(100, v))
-            result = v
-
-    return result
-
-def llm_score_coherence(
-    question: str,
-    options: Dict[str, str],
-    answer: str,
-    context: str = "",
-    fact: str = "",
-) -> int:
-    """
-    调用更强模型评估语义连贯性（0~100）
-    """
-    extra = ""
-    if context:
-        extra += f"\n【原始上下文】\n{context}\n"
-    if fact:
-        extra += f"\n【知识图谱事实】\n{fact}\n"
-
+def llm_score_coherence(question: str, options: Dict[str, str], answer: str, context: str, kg_fact: str, warnings: List[str]) -> int:
     user_prompt = f"""
 你是一名严格的试题审题专家。请只评估“语义连贯性 coherence”这一项，给出 0~100 的整数分。
-评估标准：
-- 题干是否通顺、信息是否自洽；
-- 选项是否与题干在同一语义空间；
-- 题干到选项的指向是否清晰，是否存在明显断裂/歧义/不完整导致无法作答。
-
-题目如下：
 
 【题干】
 {question}
@@ -450,48 +369,49 @@ B. {options["B"]}
 C. {options["C"]}
 D. {options["D"]}
 
-【正确答案】（仅供你评估参考，不要质疑或修改）：{answer}
+【正确答案】（仅供评估参考）：{answer}
 
-{extra}
+【原句证据】
+{context}
 
-请严格输出 JSON，不要添加任何其它文字：
-{{
-  "coherence_score": 分数(0-100),
-  "issues": ["最多3条扣分点，短句"]
-}}
+【KG事实】
+{kg_fact}
+
+请严格输出 JSON：
+{{"coherence_score": 0-100, "issues": ["最多3条"]}}
 """.strip()
 
-    resp = client.chat.completions.create(
-        model=CHAT_MODEL,
-        messages=[
-            {"role": "system", "content": "你是一名细致严格的中文法律考试命题与审题专家。"},
-            {"role": "user", "content": user_prompt},
-        ],
-        temperature=0.0,
-    )
-    content = resp.choices[0].message.content or ""
-    return parse_percent_score(content, "coherence_score", default=60)
+    try:
+        resp = client.chat.completions.create(
+            model=MODEL_NAME,
+            messages=[
+                {"role": "system", "content": "你是一名细致严格的中文法律考试命题与审题专家。"},
+                {"role": "user", "content": user_prompt},
+            ],
+            temperature=0.0,
+        )
+        content = resp.choices[0].message.content or ""
+        return parse_percent_score(content, "coherence_score", default=60)
+    except Exception as e:
+        warnings.append(f"LLM coherence 评估失败，已使用默认分60。错误：{repr(e)}")
+        return 60
 
 
 # ================== 主流程 ==================
-
 def evaluate_mcq_rows(rows: List[Dict[str, str]], kg: KGIndex, dict_names_lower: List[str]) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
     evaluated: List[Dict[str, Any]] = []
 
-    has_context = rows and ("context" in rows[0])
-    # 兼容 fact / kg_fact 两种列名
-    has_fact = rows and ("fact" in rows[0] or "kg_fact" in rows[0])
-
     warnings: List[str] = []
-    if not os.path.exists(KG_NODES_TSV) or not os.path.exists(KG_EDGES_TSV):
-        warnings.append("KG 文件不存在：C/D 关系校验无法执行。")
 
+    # Step8 v2 应该有 kg_fact/context
     if rows:
-        if not ("fact" in rows[0] or "kg_fact" in rows[0]):
-            warnings.append("题目 TSV 未包含 fact/kg_fact 列：C/D 将退化为 best-effort（不保证100%可审计）。")
+        if "kg_fact" not in rows[0]:
+            warnings.append("题目 TSV 未包含 kg_fact 列：无法做严格 C/D 校验。")
+        if "context" not in rows[0]:
+            warnings.append("题目 TSV 未包含 context 列：B 评估仍可做，但可解释性下降。")
 
-    entity_counts = []
-    relation_counts = []
+    entity_counts: List[int] = []
+    relation_counts: List[int] = []
 
     for idx, r in enumerate(rows, start=1):
         qid = r.get("qid", f"q{idx:04d}")
@@ -504,15 +424,12 @@ def evaluate_mcq_rows(rows: List[Dict[str, str]], kg: KGIndex, dict_names_lower:
         }
         answer = _norm_space(r.get("answer", "")).upper()
 
-        context = _norm_space(r.get("context", "")) if has_context else ""
-        fact_text = ""
-        if has_fact:
-            fact_text = _norm_space(r.get("fact", "")) or _norm_space(r.get("kg_fact", ""))
+        kg_fact = _norm_space(r.get("kg_fact", ""))
+        context = _norm_space(r.get("context", ""))
 
-        # 解析 fact triple（若可解析）
-        fact_trip = parse_kg_fact(fact_text) if fact_text else None
+        fact_trip = parse_kg_fact(kg_fact) if kg_fact else None
 
-        # A：实体/关系统计
+        # A：实体/关系数量
         full_text = " ".join([question, options["A"], options["B"], options["C"], options["D"]])
         ents = extract_entities_by_dict(full_text, dict_names_lower)
         ent_cnt = len(ents)
@@ -523,32 +440,13 @@ def evaluate_mcq_rows(rows: List[Dict[str, str]], kg: KGIndex, dict_names_lower:
 
         A_item = per_question_A_score(ent_cnt, rel_cnt, ideal_ent=3, ideal_rel=1)
 
-        # B：更强模型评估连贯性
+        # B：连贯性（R1）
         print(f"评估题目 {qid}（B: coherence）...")
-        B_item = llm_score_coherence(
-            question=question,
-            options=options,
-            answer=answer,
-            context=context,
-            fact=fact_text,
-        )
+        B_item = llm_score_coherence(question, options, answer, context, kg_fact, warnings)
 
-        # C/D：程序校验
-        C_item = score_C_entity_alignment(
-            kg=kg,
-            dict_names_lower=dict_names_lower,
-            question=question,
-            options=options,
-            answer=answer,
-            fact_trip=fact_trip,
-        )
-        D_item = score_D_relation_correctness(
-            kg=kg,
-            dict_names_lower=dict_names_lower,
-            options=options,
-            answer=answer,
-            fact_trip=fact_trip,
-        )
+        # C/D：严格校验
+        C_item = score_C_entity_alignment(kg, dict_names_lower, options, answer, fact_trip)
+        D_item = score_D_relation_correctness(kg, dict_names_lower, options, answer, fact_trip)
 
         total = W_A * A_item + W_B * B_item + W_C * C_item + W_D * D_item
 
@@ -561,12 +459,19 @@ def evaluate_mcq_rows(rows: List[Dict[str, str]], kg: KGIndex, dict_names_lower:
         r_out["C_entity_alignment_score"] = f"{C_item:.2f}"
         r_out["D_relation_correctness_score"] = f"{D_item:.2f}"
         r_out["Q_total"] = f"{total:.2f}"
-
         evaluated.append(r_out)
 
-    # 题套分布得分（A 的“依据分布打分100%”更偏题套级）
     suite_ent_dist = suite_distribution_score(entity_counts, TARGET_ENTITY_DIST)
     suite_rel_dist = suite_distribution_score(relation_counts, TARGET_REL_DIST)
+
+    def _avg(col: str) -> float:
+        xs = []
+        for rr in evaluated:
+            try:
+                xs.append(float(rr.get(col, "0")))
+            except Exception:
+                pass
+        return sum(xs) / len(xs) if xs else 0.0
 
     summary = {
         "timestamp": datetime.now().isoformat(),
@@ -581,39 +486,22 @@ def evaluate_mcq_rows(rows: List[Dict[str, str]], kg: KGIndex, dict_names_lower:
         "suite_entity_distribution_score": round(suite_ent_dist, 2),
         "suite_relation_distribution_score": round(suite_rel_dist, 2),
         "weights": {"A": W_A, "B": W_B, "C": W_C, "D": W_D},
-    }
-
-    # 均分
-    def _avg(col: str) -> float:
-        xs = []
-        for rr in evaluated:
-            try:
-                xs.append(float(rr.get(col, "0")))
-            except Exception:
-                pass
-        return sum(xs) / len(xs) if xs else 0.0
-
-    summary.update({
         "avg_A": round(_avg("A_entity_relation_coverage_score"), 2),
         "avg_B": round(_avg("B_coherence_score"), 2),
         "avg_C": round(_avg("C_entity_alignment_score"), 2),
         "avg_D": round(_avg("D_relation_correctness_score"), 2),
         "avg_Q_total": round(_avg("Q_total"), 2),
-    })
-
-    # 给一个“题套 A 分布融合版”的建议总分（可选）
-    summary["suggested_suite_total_with_distribution"] = round(
-        0.2 * suite_ent_dist + 0.2 * suite_rel_dist + 0.6 * summary["avg_Q_total"],
-        2
-    )
-
+        "suggested_suite_total_with_distribution": round(
+            0.2 * suite_ent_dist + 0.2 * suite_rel_dist + 0.6 * _avg("Q_total"),
+            2
+        )
+    }
     return evaluated, summary
 
 
 def main():
     if not os.path.exists(INPUT_Q_TSV):
         raise FileNotFoundError(f"找不到输入题目文件：{INPUT_Q_TSV}")
-
     if not os.path.exists(KG_NODES_TSV):
         raise FileNotFoundError(f"找不到 KG nodes：{KG_NODES_TSV}")
     if not os.path.exists(KG_EDGES_TSV):
@@ -627,11 +515,9 @@ def main():
 
     eval_rows, summary = evaluate_mcq_rows(rows, kg, dict_names_lower)
 
-    # 写出 TSV
     save_eval_rows(eval_rows, OUTPUT_EVAL_TSV)
 
-    # 写出 summary JSON（与 TSV 同目录）
-    out_json = os.path.join(os.path.dirname(OUTPUT_EVAL_TSV), "q_version1_eval_summary.json")
+    out_json = str(STEP9_EVAL_JSON)
     with open(out_json, "w", encoding="utf-8") as f:
         json.dump(summary, f, ensure_ascii=False, indent=2)
     print(f"✅ Summary 已保存：{out_json}")

@@ -62,6 +62,7 @@ STEP8_Q_TSV = STEP8_DIR / f"{LECTURE}_MCQ.tsv"
 #Step9
 STEP9_DIR = OUT_ROOT / "Step9_output"
 STEP9_EVAL_TSV = STEP9_DIR / f"{LECTURE}_MCQ_eval.tsv"
+STEP9_EVAL_JSON = STEP9_DIR / f"{LECTURE}_MCQ_eval.json"
 
 #Step10
 STEP10_DIR = OUT_ROOT / "Step10_output"
