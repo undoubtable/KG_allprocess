@@ -1,0 +1,17 @@
+update_id	qid	action	entity1_name	entity2_name	entity1_id	entity2_id	relation_type_old	relation_type_new	reason	revision_reason
+u00002	safety_truth_15pct	add_node	销售						safety-net: Truth 缺口节点（30% 选取）	
+u00003	safety_truth_15pct	add_node	身体						safety-net: Truth 缺口节点（30% 选取）	
+u00004	safety_truth_15pct	add_node	抽象的危险						safety-net: Truth 缺口节点（30% 选取）	
+u00005	safety_truth_15pct	add_node	假药						safety-net: Truth 缺口节点（30% 选取）	
+u00006	safety_truth_15pct	add_node	腿部						safety-net: Truth 缺口节点（30% 选取）	
+u00001	q0007	add_edge	生产	销售劣药罪				related_to	feedback-driven: 实体对在 Truth 中存在关系（type=Truth）	1) 修改题干：将'销售劣药罪'改为'生产、销售劣药罪'，以匹配上下文提供的实体（生产、销售劣药罪），从而解决实体对齐问题（原分数0.00），避免题干与选项C（生产行为）的不一致。2) 提升连贯性：题干添加'必须具备以下哪个条件'，使语言更流畅，并明确关系考察（成立的必要条件）。3) 选项微调：A、C、D选项改为更简洁的表述（如'存在销售行为'、'存在生产行为'、'行为人具有主观故意'），以增强迷惑性但不改变核心含义，确保B仍为唯一正确答案。
+u00007	safety_truth_15pct	add_edge	以危险方法危害公共安全罪	具体危险犯				part_of	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00008	safety_truth_15pct	add_edge	立法者	销售不符合标准的医用器材罪				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00009	safety_truth_15pct	add_edge	投放和危险物质罪	具体危险犯				part_of	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00010	safety_truth_15pct	add_edge	暴力干涉婚姻自由罪	死亡				causes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00011	safety_truth_15pct	add_edge	故意伤害罪	致人死亡				causes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00012	safety_truth_15pct	add_edge	立法者	销售假药罪				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00013	safety_truth_15pct	add_edge	立法者	具体危险犯				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00014	safety_truth_15pct	add_edge	立法者	抽象危险犯				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00015	safety_truth_15pct	add_edge	放火罪	具体危险犯				part_of	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00016	safety_truth_15pct	add_edge	非法拘禁罪	死亡				causes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	

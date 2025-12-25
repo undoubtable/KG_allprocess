@@ -18,7 +18,7 @@ output_entity_path = str(STEP3_ENT_TSV)
 
 # sent_tsv_path = r"D:\...\Step2_output\句子列表.tsv"
 # output_entity_path = r"D:\...\Step3_output\实体列表.tsv"
-
+import yaml
 # ========= LLM 配置（沿用你的 Gitee AI 调用方式） =========
 with open("config.yaml", "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)

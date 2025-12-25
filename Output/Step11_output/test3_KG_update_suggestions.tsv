@@ -1,0 +1,43 @@
+update_id	qid	action	entity1_name	entity2_name	entity1_id	entity2_id	relation_type_old	relation_type_new	reason	revision_reason
+u00005	safety_truth_15pct	add_node	身份						safety-net: Truth 缺口节点（30% 选取）	
+u00006	safety_truth_15pct	add_node	实行犯						safety-net: Truth 缺口节点（30% 选取）	
+u00007	safety_truth_15pct	add_node	妻子						safety-net: Truth 缺口节点（30% 选取）	
+u00008	safety_truth_15pct	add_node	临时工						safety-net: Truth 缺口节点（30% 选取）	
+u00009	safety_truth_15pct	add_node	化工厂协助杀人案						safety-net: Truth 缺口节点（30% 选取）	
+u00010	safety_truth_15pct	add_node	纯正的单位犯罪						safety-net: Truth 缺口节点（30% 选取）	
+u00011	safety_truth_15pct	add_node	移民						safety-net: Truth 缺口节点（30% 选取）	
+u00012	safety_truth_15pct	add_node	土地征收						safety-net: Truth 缺口节点（30% 选取）	
+u00013	safety_truth_15pct	add_node	单位的分支机构或内设机构						safety-net: Truth 缺口节点（30% 选取）	
+u00014	safety_truth_15pct	add_node	自己名义犯罪						safety-net: Truth 缺口节点（30% 选取）	
+u00015	safety_truth_15pct	add_node	违法所得						safety-net: Truth 缺口节点（30% 选取）	
+u00001	q0021	add_edge	狗剩	狗蛋				punishes	feedback-driven: 实体对在 Truth 中存在关系（type=Truth）	1) 修改题干：将原题干中'在(2016 年第 62 题)中'的间接引用替换为直接基于上下文内容（狗蛋请求借用物品的目的），以消除外部事实依赖，提升实体对齐（从原0分）。2) 在题干中加入'意图干掉情敌狗剩'，体现'目的关系'（请求借用物品用于谋杀），提升关系正确性（从原0分）。3) 选项保持不变，因为干扰项如B选项'毒药'（泛称类）与A'氰化钾'（具体实例）相关但不等价，C和D选项作为其他武器提供迷惑性，且未引入新事实。4) 整体提升语义连贯性，题干与选项更直接对齐。
+u00002	q0022	add_edge	狗蛋	狗剩				punishes	feedback-driven: 实体对在 Truth 中存在关系（type=Truth）	1) 将题干中的实体从'厂长与狗剩'改为'狗蛋与狗剩'，以解决实体对齐问题（原C_entity_alignment_score=0）。这是因为上下文仅显示狗蛋称狗剩为'情敌'，未提及厂长与狗剩的直接关系；2) 提升语义连贯性（原B_coherence_score=40），使题干更明确基于狗蛋的陈述'情敌狗剩'，避免模糊引用；3) 干扰项未改动，因为上下文未提供其他关系线索，但实体对齐后干扰项（如雇佣关系）在狗蛋与狗剩间更显不合理，增强了迷惑性而不等价。
+u00003	q0025	add_edge	刑法	单位				defines	feedback-driven: 实体对在 Truth 中存在关系（type=Truth）	1) 实体对齐分数为0.00：原题干提到'只能由单位构成'的犯罪，但选项未体现定义关系，导致题干与选项实体不匹配。我将题干改为'被定义为只能由单位构成'，强调定义关系，使选项直接对应'犯罪类型'，避免题干说A选项说B的不一致。2) 关系正确性分数为0.00：原题缺乏明确关系考察，改为'被定义为'体现定义关系（如'定义'关系），聚焦内部逻辑而非外部事实。3) 覆盖度和连贯性分数较低（60.00）：题干更简洁明确，提升语义连贯性；选项保持不变但干扰项（A、B、D）在语境中更像可能涉及单位的犯罪（如贪污罪可能由单位引发），但设定C为唯一'被定义为'单位专属的选项，增加迷惑性而不等价。4) 遵守硬约束：未引入外部事实，仅依赖题干内部定义；题目仍为单选；正确答案保持C。
+u00004	q0047	add_edge	单位犯罪	犯罪主体				includes	feedback-driven: 实体对在 Truth 中存在关系（type=Truth）	针对原题B_coherence_score较低（40.00），提升语义连贯性：将题干更改为明确提及'单位犯罪'，使题干与上下文（单位意志为核心）一致，避免原题'犯罪主体'过于宽泛导致的语义跳跃；同时，为增强干扰项迷惑性（软目标），将选项A从'成员个人利益'改为'成员个人意志'（基于上下文提供的'成员个人意志'），使其与'单位意志'更相似但不正确；其他选项保持不变，未引入外部事实，确保关系正确性（依赖关系）和实体对齐。
+u00016	safety_truth_15pct	add_edge	公立大学财务处会计	国家工作人员				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00017	safety_truth_15pct	add_edge	国家机关工作人员	报复陷害罪				applies_to	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00018	safety_truth_15pct	add_edge	国家机关工作人员	诬告陷害罪				applies_to	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00019	safety_truth_15pct	add_edge	有价证券诈骗罪	金融诈骗罪				part_of	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00020	safety_truth_15pct	add_edge	信用卡诈骗罪	金融诈骗罪				part_of	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00021	safety_truth_15pct	add_edge	不真正身份犯	特殊身份				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00022	safety_truth_15pct	add_edge	直接责任人员	个人犯罪				part_of	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00023	safety_truth_15pct	add_edge	贷款诈骗罪	金融诈骗罪				part_of	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00024	safety_truth_15pct	add_edge	司法解释	自然人犯罪				applies_to	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00025	safety_truth_15pct	add_edge	国家工作人员	受贿罪				causes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00026	safety_truth_15pct	add_edge	真正身份犯	特殊身份				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00027	safety_truth_15pct	add_edge	村干部	国家工作人员				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00028	safety_truth_15pct	add_edge	直接责任人	个人犯罪				punishes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00029	safety_truth_15pct	add_edge	私营单位	法人资格				applies_to	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00030	safety_truth_15pct	add_edge	单位犯罪	非法利益				causes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00031	safety_truth_15pct	add_edge	犯罪主体	加减身份				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00032	safety_truth_15pct	add_edge	个人犯罪	非法利益				includes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00033	safety_truth_15pct	add_edge	犯罪主体	单位犯罪				includes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00034	safety_truth_15pct	add_edge	单位犯罪	非法利益				includes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00035	safety_truth_15pct	add_edge	共同犯罪	单位犯罪				part_of	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00036	safety_truth_15pct	add_edge	甲公司	单位行贿罪				punishes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00037	safety_truth_15pct	add_edge	刑法	直接责任人				applies_to	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00038	safety_truth_15pct	add_edge	甲公司	非法利益				causes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00039	safety_truth_15pct	add_edge	个人犯罪	行贿罪				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00040	safety_truth_15pct	add_edge	刑法	贷款诈骗罪				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00041	safety_truth_15pct	add_edge	刑法	伪造货币罪				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00042	safety_truth_15pct	add_edge	人民团体	共青团				includes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	

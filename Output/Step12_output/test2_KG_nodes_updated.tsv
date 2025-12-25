@@ -1,0 +1,46 @@
+node_id	label	name	page_no	sentence_id
+n00001	Concept	保护法益	1	s0002
+n00002	Concept	保障人权	1	s0002
+n00003	Book	肖申克的救赎	1	s0003
+n00004	Person	男主角	1	s0003
+n00005	Crime	越狱案	1	s0004
+n00006	Concept	犯罪客体	1	s0004
+n00007	Concept	法益	1	s0004
+n00008	Law	刑法	1	s0005
+n00009	Crime	故意杀人罪	1	s0005
+n00010	Concept	人的生命	1	s0005
+n00011	Crime	罪名	1	s0006
+n00012	Concept	保护客体	1	s0006
+n00013	Crime	犯罪	1	s0007
+n00014	Concept	犯罪对象	1	s0009
+n00015	Crime	盗窃	1	s0010
+n00016	Concept	财产权	1	s0010
+n00017	Book	第一讲	1	s0012
+n00018	Concept	目的解释	1	s0012
+n00019	Location	国外	1	s0015
+n00020	Location	国内	1	s0015
+n00021	Crime	非法侵入住宅罪	1	s0017
+n00022	Crime	该罪	1	s0018
+n00023	Concept	居住生活安宁状态	1	s0018
+n00024	Crime	擅赣民宅	1	s0022
+n00025	Law	进入许可权	1	s0022
+n00026	Concept	人权	1	s0023
+n00027	Concept	善良人的大宪章	1	s0024
+n00028	Concept	犯罪人的大完章	1	s0024
+n00029	Concept	法益侵害说	1	s0027
+n00030	Concept	规范违反说	1	s0027
+n00031	Law	法律	1	s0029
+n00032	Concept	道德	1	s0029
+n00033	Person	张明楷教授	1	s0030
+n00034	Other	法考官方教材的主编	1	s0030
+n00035	Book	行为无价值论与结果无价值论	1	s0030
+n00036	Person	研究生	1	s0032
+n00037	Crime	犯罪客体	2	s0034
+n00038	Crime	脱逃罪	2	s0039
+n00039	Law	司法解释	2	s0041
+n00040	Org	最高人民法院研究室	2	s0042
+n00041	Concept	Prod	-1	
+n00042	Concept	菲客体	-1	
+n00043	Concept	越犹	-1	
+n00044	Concept	脱迷菲	-1	
+n00045	Concept	盗窃徘	-1	

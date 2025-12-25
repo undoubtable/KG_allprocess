@@ -1,0 +1,9 @@
+update_id	qid	action	entity1_name	entity2_name	entity1_id	entity2_id	relation_type_old	relation_type_new	reason	revision_reason
+u00001	safety_truth_15pct	add_node	Prod						safety-net: Truth 缺口节点（30% 选取）	
+u00002	safety_truth_15pct	add_node	菲客体						safety-net: Truth 缺口节点（30% 选取）	
+u00003	safety_truth_15pct	add_node	越犹						safety-net: Truth 缺口节点（30% 选取）	
+u00004	safety_truth_15pct	add_node	脱迷菲						safety-net: Truth 缺口节点（30% 选取）	
+u00005	safety_truth_15pct	add_node	盗窃徘						safety-net: Truth 缺口节点（30% 选取）	
+u00006	safety_truth_15pct	add_edge	保护法益	居住生活安宁状态				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00007	safety_truth_15pct	add_edge	犯罪对象	犯罪客体				part_of	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00008	safety_truth_15pct	add_edge	故意杀人罪	法益				applies_to	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	

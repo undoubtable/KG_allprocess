@@ -1,0 +1,67 @@
+update_id	qid	action	entity1_name	entity2_name	entity1_id	entity2_id	relation_type_old	relation_type_new	reason	revision_reason
+u00002	safety_truth_15pct	add_node	有毒饮料						safety-net: Truth 缺口节点（30% 选取）	
+u00003	safety_truth_15pct	add_node	饮料						safety-net: Truth 缺口节点（30% 选取）	
+u00004	safety_truth_15pct	add_node	行为人的自身特征						safety-net: Truth 缺口节点（30% 选取）	
+u00005	safety_truth_15pct	add_node	性病						safety-net: Truth 缺口节点（30% 选取）	
+u00006	safety_truth_15pct	add_node	淫秽物品						safety-net: Truth 缺口节点（30% 选取）	
+u00007	safety_truth_15pct	add_node	客观要素						safety-net: Truth 缺口节点（30% 选取）	
+u00008	safety_truth_15pct	add_node	犯罪故意或目的						safety-net: Truth 缺口节点（30% 选取）	
+u00009	safety_truth_15pct	add_node	实行行为时						safety-net: Truth 缺口节点（30% 选取）	
+u00010	safety_truth_15pct	add_node	乙家门口						safety-net: Truth 缺口节点（30% 选取）	
+u00011	safety_truth_15pct	add_node	犯罪预备						safety-net: Truth 缺口节点（30% 选取）	
+u00012	safety_truth_15pct	add_node	两罪						safety-net: Truth 缺口节点（30% 选取）	
+u00013	safety_truth_15pct	add_node	其他同学						safety-net: Truth 缺口节点（30% 选取）	
+u00014	safety_truth_15pct	add_node	劫菲						safety-net: Truth 缺口节点（30% 选取）	
+u00015	safety_truth_15pct	add_node	学校						safety-net: Truth 缺口节点（30% 选取）	
+u00016	safety_truth_15pct	add_node	杀死						safety-net: Truth 缺口节点（30% 选取）	
+u00017	safety_truth_15pct	add_node	缆车						safety-net: Truth 缺口节点（30% 选取）	
+u00018	safety_truth_15pct	add_node	谴责						safety-net: Truth 缺口节点（30% 选取）	
+u00019	safety_truth_15pct	add_node	已经预见						safety-net: Truth 缺口节点（30% 选取）	
+u00020	safety_truth_15pct	add_node	轻信能够避免						safety-net: Truth 缺口节点（30% 选取）	
+u00021	safety_truth_15pct	add_node	已经预见到结果可能发生						safety-net: Truth 缺口节点（30% 选取）	
+u00022	safety_truth_15pct	add_node	态度						safety-net: Truth 缺口节点（30% 选取）	
+u00023	safety_truth_15pct	add_node	主观心理						safety-net: Truth 缺口节点（30% 选取）	
+u00024	safety_truth_15pct	add_node	疾驶						safety-net: Truth 缺口节点（30% 选取）	
+u00025	safety_truth_15pct	add_node	应当预见						safety-net: Truth 缺口节点（30% 选取）	
+u00026	safety_truth_15pct	add_node	玻名大意						safety-net: Truth 缺口节点（30% 选取）	
+u00027	safety_truth_15pct	add_node	结果预见可能性						safety-net: Truth 缺口节点（30% 选取）	
+u00028	safety_truth_15pct	add_node	是否已经预见						safety-net: Truth 缺口节点（30% 选取）	
+u00029	safety_truth_15pct	add_node	手术						safety-net: Truth 缺口节点（30% 选取）	
+u00030	safety_truth_15pct	add_node	纱布						safety-net: Truth 缺口节点（30% 选取）	
+u00031	safety_truth_15pct	add_node	感染						safety-net: Truth 缺口节点（30% 选取）	
+u00032	safety_truth_15pct	add_node	玖忽大意						safety-net: Truth 缺口节点（30% 选取）	
+u00033	safety_truth_15pct	add_node	无法预见						safety-net: Truth 缺口节点（30% 选取）	
+u00034	safety_truth_15pct	add_node	没有预见						safety-net: Truth 缺口节点（30% 选取）	
+u00035	safety_truth_15pct	add_node	预见可能性						safety-net: Truth 缺口节点（30% 选取）	
+u00036	safety_truth_15pct	add_node	意外						safety-net: Truth 缺口节点（30% 选取）	
+u00037	safety_truth_15pct	add_node	错误						safety-net: Truth 缺口节点（30% 选取）	
+u00001	q0034	add_edge	刑法	故意				related_to	feedback-driven: 实体对在 Truth 中存在关系（type=Truth）	1) 修改题干，添加‘心理状态’和‘在刑法概念中’以明确实体类型，确保所有选项（包括过失和意外事件）与题干实体‘概括故意’可比，提升实体对齐（原得分0）；2) 保持关系‘不构成对立排斥关系’但更清晰，避免模糊性，提升关系正确性（原得分0）；3) 优化语义连贯性，使题干更流畅；4) 选项未大改以不引入外部事实，但通过题干调整提升覆盖度；5) 干扰项（B、C、D）保持原样，因直接故意相似但非等价，过失和意外事件自然排斥以维持迷惑性。
+u00038	safety_truth_15pct	add_edge	同一构成要件内的认识错误	客观构成要件				includes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00039	safety_truth_15pct	add_edge	疏忽大意的过失	过失致人死亡罪				causes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00040	safety_truth_15pct	add_edge	专题讲座精讲卷	事实认识错误				includes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00041	safety_truth_15pct	add_edge	具体符合说	故意杀人罪未遂				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00042	safety_truth_15pct	add_edge	法定符合说	故意杀人罪未遂				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00043	safety_truth_15pct	add_edge	故意杀人罪	过失致人死亡罪				includes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00044	safety_truth_15pct	add_edge	帮助毁灭证据罪	上游犯罪				applies_to	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00045	safety_truth_15pct	add_edge	具体符合说	过失致死亡罪				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00046	safety_truth_15pct	add_edge	盗穷枪支罪	普通盗穷罪				includes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00047	safety_truth_15pct	add_edge	故意杀人罪	故意伤害罪				includes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00048	safety_truth_15pct	add_edge	直接故意	故意杀人罪				applies_to	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00049	safety_truth_15pct	add_edge	过失致人死亡罪	妻子				applies_to	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00050	safety_truth_15pct	add_edge	间接故意	故意杀人罪				applies_to	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00051	safety_truth_15pct	add_edge	间接故意	故意杀人罪				causes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00052	safety_truth_15pct	add_edge	医生	疏忽大意的过失				causes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00053	safety_truth_15pct	add_edge	客观构成要件	杀死人				includes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00054	safety_truth_15pct	add_edge	故意毁坏财物罪	既遂				includes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00055	safety_truth_15pct	add_edge	金融诈骗罪	诈骗罪				includes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00056	safety_truth_15pct	add_edge	故意杀人罪	妻子				applies_to	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00057	safety_truth_15pct	add_edge	贩卖毒品罪	毒品				applies_to	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00058	safety_truth_15pct	add_edge	故意杀人罪	既遂				includes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00059	safety_truth_15pct	add_edge	故意杀人罪	未遂				includes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00060	safety_truth_15pct	add_edge	交通法规	行政法				part_of	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00061	safety_truth_15pct	add_edge	侵占罪	不当得利				punishes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00062	safety_truth_15pct	add_edge	张明楷	刑法学				defines	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00063	safety_truth_15pct	add_edge	红灯	交通法规				part_of	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00064	safety_truth_15pct	add_edge	安眠药	丈夫				applies_to	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00065	safety_truth_15pct	add_edge	人质	绑架罪				applies_to	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
+u00066	safety_truth_15pct	add_edge	二皇子	太子				causes	safety-net: Truth 缺口有向边（30% 选取, keep_direction=True）	
