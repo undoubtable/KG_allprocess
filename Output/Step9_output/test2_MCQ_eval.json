@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-12-24T20:17:59.751761",
+  "input_questions_tsv": "D:\\Desktop\\KG_allprocess\\Output\\Step8_output\\test2_MCQ.tsv",
+  "output_eval_tsv": "D:\\Desktop\\KG_allprocess\\Output\\Step9_output\\test2_MCQ_eval.tsv",
+  "kg_nodes_tsv": "D:\\Desktop\\KG_allprocess\\Output\\Step4_output\\test2_KG_nodes.tsv",
+  "kg_edges_tsv": "D:\\Desktop\\KG_allprocess\\Output\\Step4_output\\test2_KG_edges.tsv",
+  "num_questions": 12,
+  "warnings": [],
+  "target_entity_dist": {
+    "2": 0.35,
+    "3": 0.45,
+    "4": 0.2
+  },
+  "target_rel_dist": {
+    "1": 1.0
+  },
+  "suite_entity_distribution_score": 78.33,
+  "suite_relation_distribution_score": 100.0,
+  "weights": {
+    "A": 0.25,
+    "B": 0.25,
+    "C": 0.25,
+    "D": 0.25
+  },
+  "avg_A": 93.33,
+  "avg_B": 87.5,
+  "avg_C": 75.0,
+  "avg_D": 75.0,
+  "avg_Q_total": 82.71,
+  "suggested_suite_total_with_distribution": 85.29
+}

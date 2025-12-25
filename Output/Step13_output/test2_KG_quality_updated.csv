@@ -1,0 +1,36 @@
+﻿metric_name,value,category,description_cn
+strict_entity_tp,0.0,strict,实体TP数量：baseline与truth匹配到的实体数
+strict_entity_fp,45.0,strict,实体FP数量：baseline多抽出的实体数（truth中没有匹配）
+strict_entity_fn,54.0,strict,实体FN数量：truth漏掉的实体数（baseline没覆盖）
+strict_entity_precision,0.0,strict,实体正确率Precision：baseline抽取实体中有多少比例是对的
+strict_entity_recall,0.0,strict,实体覆盖度Recall：truth实体中有多少比例被baseline覆盖
+strict_entity_f1,0.0,strict,实体F1：Precision与Recall的调和平均
+strict_relation_tp,0.0,strict,关系TP数量：baseline与truth匹配到的关系三元组数
+strict_relation_fp,23.0,strict,关系FP数量：baseline多抽出的关系三元组（truth中不存在）
+strict_relation_fn,19.0,strict,关系FN数量：truth中的关系三元组被baseline漏掉的数量
+strict_relation_precision,0.0,strict,关系正确率Precision：baseline抽取关系中有多少比例是对的
+strict_relation_recall,0.0,strict,关系覆盖度Recall：truth关系中有多少比例被baseline覆盖
+strict_relation_f1,0.0,strict,关系F1：Precision与Recall的调和平均
+strict_entity_coverage_recall,0.0,strict,实体覆盖度（同 entity_recall）
+strict_relation_coverage_recall,0.0,strict,关系覆盖度（同 relation_recall）
+strict_correct_entities_share_in_truth,0.0,strict,正确实体在truth中的占比（同实体Recall）
+strict_correct_edges_share_in_truth,0.0,strict,正确关系在truth中的占比（同关系Recall）
+relaxed_entity_tp,34.0,relaxed,实体TP数量：baseline与truth匹配到的实体数
+relaxed_entity_fp,10.0,relaxed,实体FP数量：baseline多抽出的实体数（truth中没有匹配）
+relaxed_entity_fn,7.0,relaxed,实体FN数量：truth漏掉的实体数（baseline没覆盖）
+relaxed_entity_precision,0.7727272727272727,relaxed,实体正确率Precision：baseline抽取实体中有多少比例是对的
+relaxed_entity_recall,0.8292682926829268,relaxed,实体覆盖度Recall：truth实体中有多少比例被baseline覆盖
+relaxed_entity_f1,0.7999999999999999,relaxed,实体F1：Precision与Recall的调和平均
+relaxed_relation_tp,6.0,relaxed,关系TP数量：baseline与truth匹配到的关系三元组数
+relaxed_relation_fp,8.0,relaxed,关系FP数量：baseline多抽出的关系三元组（truth中不存在）
+relaxed_relation_fn,13.0,relaxed,关系FN数量：truth中的关系三元组被baseline漏掉的数量
+relaxed_relation_precision,0.42857142857142855,relaxed,关系正确率Precision：baseline抽取关系中有多少比例是对的
+relaxed_relation_recall,0.3157894736842105,relaxed,关系覆盖度Recall：truth关系中有多少比例被baseline覆盖
+relaxed_relation_f1,0.36363636363636365,relaxed,关系F1：Precision与Recall的调和平均
+relaxed_entity_coverage_recall,0.8292682926829268,relaxed,实体覆盖度（同 entity_recall）
+relaxed_relation_coverage_recall,0.3157894736842105,relaxed,关系覆盖度（同 relation_recall）
+relaxed_correct_entities_share_in_truth,0.8292682926829268,relaxed,正确实体在truth中的占比（同实体Recall）
+relaxed_correct_edges_share_in_truth,0.3157894736842105,relaxed,正确关系在truth中的占比（同关系Recall）
+relaxed_relaxed_dropped_edges_unmapped_endpoints,8.0,relaxed,宽松评估中：由于头尾实体无法对齐而被丢弃的baseline边数量
+relaxed_relaxed_mapped_triples_count,14.0,relaxed,宽松评估中：baseline三元组在实体映射后可比较的数量
+relaxed_truth_triples_count,19.0,relaxed,宽松评估中：truth三元组总数量（用于比较）

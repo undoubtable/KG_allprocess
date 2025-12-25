@@ -1,0 +1,212 @@
+[
+  {
+    "metric_name": "strict_entity_tp",
+    "value": 17.0,
+    "category": "strict",
+    "description_cn": "实体TP数量：baseline与truth匹配到的实体数"
+  },
+  {
+    "metric_name": "strict_entity_fp",
+    "value": 445.0,
+    "category": "strict",
+    "description_cn": "实体FP数量：baseline多抽出的实体数（truth中没有匹配）"
+  },
+  {
+    "metric_name": "strict_entity_fn",
+    "value": 537.0,
+    "category": "strict",
+    "description_cn": "实体FN数量：truth漏掉的实体数（baseline没覆盖）"
+  },
+  {
+    "metric_name": "strict_entity_precision",
+    "value": 0.0367965367965368,
+    "category": "strict",
+    "description_cn": "实体正确率Precision：baseline抽取实体中有多少比例是对的"
+  },
+  {
+    "metric_name": "strict_entity_recall",
+    "value": 0.030685920577617327,
+    "category": "strict",
+    "description_cn": "实体覆盖度Recall：truth实体中有多少比例被baseline覆盖"
+  },
+  {
+    "metric_name": "strict_entity_f1",
+    "value": 0.03346456692913386,
+    "category": "strict",
+    "description_cn": "实体F1：Precision与Recall的调和平均"
+  },
+  {
+    "metric_name": "strict_relation_tp",
+    "value": 3.0,
+    "category": "strict",
+    "description_cn": "关系TP数量：baseline与truth匹配到的关系三元组数"
+  },
+  {
+    "metric_name": "strict_relation_fp",
+    "value": 293.0,
+    "category": "strict",
+    "description_cn": "关系FP数量：baseline多抽出的关系三元组（truth中不存在）"
+  },
+  {
+    "metric_name": "strict_relation_fn",
+    "value": 183.0,
+    "category": "strict",
+    "description_cn": "关系FN数量：truth中的关系三元组被baseline漏掉的数量"
+  },
+  {
+    "metric_name": "strict_relation_precision",
+    "value": 0.010135135135135136,
+    "category": "strict",
+    "description_cn": "关系正确率Precision：baseline抽取关系中有多少比例是对的"
+  },
+  {
+    "metric_name": "strict_relation_recall",
+    "value": 0.016129032258064516,
+    "category": "strict",
+    "description_cn": "关系覆盖度Recall：truth关系中有多少比例被baseline覆盖"
+  },
+  {
+    "metric_name": "strict_relation_f1",
+    "value": 0.012448132780082988,
+    "category": "strict",
+    "description_cn": "关系F1：Precision与Recall的调和平均"
+  },
+  {
+    "metric_name": "strict_entity_coverage_recall",
+    "value": 0.030685920577617327,
+    "category": "strict",
+    "description_cn": "实体覆盖度（同 entity_recall）"
+  },
+  {
+    "metric_name": "strict_relation_coverage_recall",
+    "value": 0.016129032258064516,
+    "category": "strict",
+    "description_cn": "关系覆盖度（同 relation_recall）"
+  },
+  {
+    "metric_name": "strict_correct_entities_share_in_truth",
+    "value": 0.030685920577617327,
+    "category": "strict",
+    "description_cn": "正确实体在truth中的占比（同实体Recall）"
+  },
+  {
+    "metric_name": "strict_correct_edges_share_in_truth",
+    "value": 0.016129032258064516,
+    "category": "strict",
+    "description_cn": "正确关系在truth中的占比（同关系Recall）"
+  },
+  {
+    "metric_name": "relaxed_entity_tp",
+    "value": 296.0,
+    "category": "relaxed",
+    "description_cn": "实体TP数量：baseline与truth匹配到的实体数"
+  },
+  {
+    "metric_name": "relaxed_entity_fp",
+    "value": 130.0,
+    "category": "relaxed",
+    "description_cn": "实体FP数量：baseline多抽出的实体数（truth中没有匹配）"
+  },
+  {
+    "metric_name": "relaxed_entity_fn",
+    "value": 70.0,
+    "category": "relaxed",
+    "description_cn": "实体FN数量：truth漏掉的实体数（baseline没覆盖）"
+  },
+  {
+    "metric_name": "relaxed_entity_precision",
+    "value": 0.6948356807511737,
+    "category": "relaxed",
+    "description_cn": "实体正确率Precision：baseline抽取实体中有多少比例是对的"
+  },
+  {
+    "metric_name": "relaxed_entity_recall",
+    "value": 0.8087431693989071,
+    "category": "relaxed",
+    "description_cn": "实体覆盖度Recall：truth实体中有多少比例被baseline覆盖"
+  },
+  {
+    "metric_name": "relaxed_entity_f1",
+    "value": 0.7474747474747475,
+    "category": "relaxed",
+    "description_cn": "实体F1：Precision与Recall的调和平均"
+  },
+  {
+    "metric_name": "relaxed_relation_tp",
+    "value": 48.0,
+    "category": "relaxed",
+    "description_cn": "关系TP数量：baseline与truth匹配到的关系三元组数"
+  },
+  {
+    "metric_name": "relaxed_relation_fp",
+    "value": 93.0,
+    "category": "relaxed",
+    "description_cn": "关系FP数量：baseline多抽出的关系三元组（truth中不存在）"
+  },
+  {
+    "metric_name": "relaxed_relation_fn",
+    "value": 123.0,
+    "category": "relaxed",
+    "description_cn": "关系FN数量：truth中的关系三元组被baseline漏掉的数量"
+  },
+  {
+    "metric_name": "relaxed_relation_precision",
+    "value": 0.3404255319148936,
+    "category": "relaxed",
+    "description_cn": "关系正确率Precision：baseline抽取关系中有多少比例是对的"
+  },
+  {
+    "metric_name": "relaxed_relation_recall",
+    "value": 0.2807017543859649,
+    "category": "relaxed",
+    "description_cn": "关系覆盖度Recall：truth关系中有多少比例被baseline覆盖"
+  },
+  {
+    "metric_name": "relaxed_relation_f1",
+    "value": 0.30769230769230765,
+    "category": "relaxed",
+    "description_cn": "关系F1：Precision与Recall的调和平均"
+  },
+  {
+    "metric_name": "relaxed_entity_coverage_recall",
+    "value": 0.8087431693989071,
+    "category": "relaxed",
+    "description_cn": "实体覆盖度（同 entity_recall）"
+  },
+  {
+    "metric_name": "relaxed_relation_coverage_recall",
+    "value": 0.2807017543859649,
+    "category": "relaxed",
+    "description_cn": "关系覆盖度（同 relation_recall）"
+  },
+  {
+    "metric_name": "relaxed_correct_entities_share_in_truth",
+    "value": 0.8087431693989071,
+    "category": "relaxed",
+    "description_cn": "正确实体在truth中的占比（同实体Recall）"
+  },
+  {
+    "metric_name": "relaxed_correct_edges_share_in_truth",
+    "value": 0.2807017543859649,
+    "category": "relaxed",
+    "description_cn": "正确关系在truth中的占比（同关系Recall）"
+  },
+  {
+    "metric_name": "relaxed_relaxed_dropped_edges_unmapped_endpoints",
+    "value": 149.0,
+    "category": "relaxed",
+    "description_cn": "宽松评估中：由于头尾实体无法对齐而被丢弃的baseline边数量"
+  },
+  {
+    "metric_name": "relaxed_relaxed_mapped_triples_count",
+    "value": 141.0,
+    "category": "relaxed",
+    "description_cn": "宽松评估中：baseline三元组在实体映射后可比较的数量"
+  },
+  {
+    "metric_name": "relaxed_truth_triples_count",
+    "value": 171.0,
+    "category": "relaxed",
+    "description_cn": "宽松评估中：truth三元组总数量（用于比较）"
+  }
+]
