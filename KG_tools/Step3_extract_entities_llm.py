@@ -28,7 +28,7 @@ client = OpenAI(
     api_key=config["api_key"],
     default_headers={"X-Failover-Enabled": "true"},
 )
-
+ # client 调用
 MODEL_NAME = "DeepSeek-V3"  # 实体抽取推荐用 V3
 
 # ========= 抽取与过滤参数 =========
