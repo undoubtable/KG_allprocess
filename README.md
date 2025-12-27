@@ -1,5 +1,7 @@
 [![中关村学院 GitHub 组织](https://img.shields.io/badge/Linked%20to-bjzgcai%20Org-blue?logo=github)](https://github.com/bjzgcai)
 
+# TJU
+
 KG-QG Here you can INPUT a PDF to Generate questions.
 
 KG-QG 图谱自进化带来的高质量问题生成，目前只是一个想法还不完善，欢迎各位提出意见。
