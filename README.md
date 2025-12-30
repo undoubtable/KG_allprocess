@@ -4,13 +4,13 @@
 
 KG-QG Here you can INPUT a PDF to Generate questions.
 
-KG-QG 图谱自进化带来的高质量问题生成，目前只是一个想法还不完善，欢迎各位提出意见。
+SEKG-QG 图谱自进化带来的高质量问题生成，目前只是一个想法还不够完善，欢迎各位提出意见。
 
 # Title : A Framework for Self-evolution of Knowledge Graphs Based on Feedback Driven Evolution
 
 # 整个文章的pipeline如下：
 
-![Figure1](Picture/Figure1.png)
+![Figure1](Picture/SEKG-QG_01.png)
 
 ## 🚩 技术路线
 
