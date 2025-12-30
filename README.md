@@ -1,14 +1,13 @@
 [![中关村学院 GitHub 组织](https://img.shields.io/badge/Linked%20to-bjzgcai%20Org-blue?logo=github)](https://github.com/bjzgcai)
 
-# TJU
+# SEKG-QG
 
-KG-QG Here you can INPUT a PDF to Generate questions.
+Here you can INPUT a PDF to Generate questions.
 
-SEKG-QG 图谱自进化带来的高质量问题生成，目前只是一个想法还不够完善，欢迎各位提出意见。
+SEKG-QG 基于反馈的图谱自进化带来的高质量问题生成，目前只是一个想法还不够完善，欢迎各位提出意见。
 
 # Title : A Framework for Self-evolution of Knowledge Graphs Based on Feedback Driven Evolution
-
-# 整个文章的pipeline如下：
+# 一种基于反馈驱动演化的知识图谱自进化框架
 
 ![Figure1](Picture/SEKG-QG_01.png)
 
@@ -100,41 +99,3 @@ GitHub代码地址：[https://github.com/undoubtable/KG_allprocess.git](https://
 [Output](/Output)                   Here, you can see what you output.
 
 [PDF_files](/PDF_files)             Here, you can inpput your PDF files.
-
-
-## 👺需要进一步的改进：
-
-- [ ] 知识图谱的改进；
-
-  之前不是提取了文中的实体与关系嘛，那么这些是否真的准确呢？
-
-  实体目前来看是比较准确的，实体之间的关系判断可以借助LLM进一步优化。
-
-  实体比较准确，但是关系很粗，因此尝试加入LLM进行改进。
-
-- [ ] 图谱质量的评估标准，每一条都使其可以量化；
-
-  比如一个小一点的模型例如v3去提取实体这样子，让v1生成一个总体的知识图谱，认为这个是真值；
-
-  对比指标：
-
-  实体覆盖度100%；
-
-  实体关系正确率100%；
-
-  实体和边分别在总KG的占比100%；
-
-  尝试对整体进行一个量化。
-- [ ] 问题质量的评估标准，每一条都使其可以量化；
-
-  问题的质量评估需要如下指标：
-
-  问题的题干和选项中包含的实体与考察关系的个数；
-
-  问题与选项的语义连贯性（可以让LLM给出一个连贯的分数转为百分比100%）；
-
-  答案与题目的对应正确率100%；
-- [ ] 之后可以尝试修改提示词进一步提升性能。
-
-  后续进行提升拓展。
-
