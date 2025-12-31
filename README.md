@@ -102,3 +102,55 @@ GitHub代码地址：[https://github.com/undoubtable/KG_allprocess.git](https://
 [Output](/Output)                   Here, you can see what you output.
 
 [PDF_files](/PDF_files)             Here, you can inpput your PDF files.
+
+## **环境要求**
+
+- **Python**: 建议使用 `Python 3.8+`。
+- **虚拟环境（推荐）**: 使用 `venv` 或 `conda` 创建隔离环境：
+
+```powershell
+python -m venv .venv
+# 激活（PowerShell）
+.\.venv\Scripts\Activate.ps1
+pip install -U pip
+```
+
+- **依赖安装**: 如果仓库中存在 `requirements.txt`（或 `KG_tools/requirements.txt`），运行：
+
+```bash
+pip install -r requirements.txt
+# 或
+pip install -r KG_tools/requirements.txt
+```
+
+- **OCR 与外部工具**: 若使用 OCR（`pytesseract`），需在系统中安装 Tesseract OCR 并将其可执行文件路径加入 `PATH`；Windows 可参考 Tesseract 官方安装包。
+- **Neo4j**: 若要将图谱加载到 Neo4j，请安装并启动 Neo4j（社区版即可），并在 `KG_tools/Step6_load_to_neo4j.py` 中配置连接信息（host/username/password 或使用环境变量）。
+
+## **如何运行**
+
+- **一键运行（自动化流水线）**: 仓库提供自动化脚本，可运行完整流程或批量任务：
+
+```bash
+# 运行单次流水线
+python KG_tools/run_pipeline.py
+
+# 批量处理（按配置批量运行）
+python KG_tools/run_batch.py
+```
+
+- **按步骤运行（调试/开发）**: 可单独运行各步骤脚本以便调试或逐步执行：
+
+```bash
+python KG_tools/Step1_pdf_to_text.py   # PDF -> 文本（OCR）
+python KG_tools/Step2_ocr_text_to_sentences.py
+python KG_tools/Step3_extract_entities_simple.py
+python KG_tools/Step4_extract_relations_simple.py
+python KG_tools/Step5_build_kg.py
+python KG_tools/Step6_load_to_neo4j.py
+python KG_tools/Step7_evaluate_kg.py
+python KG_tools/Step8_generate_questions_simple.py
+```
+
+- **模型/凭证配置**: 如果流程中使用外部大模型或云服务，请在 `KG_tools/config.yaml` 中填写相应的凭证与模型配置，或将凭证设置为环境变量（例如 `OPENAI_API_KEY` 或其他服务的 API_KEY）。
+
+- **示例数据位置**: 输入 PDF 放在 `PDF_files/`，生成与中间输出文件位于 `Output/` 目录下（详见上方表格）。
