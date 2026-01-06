@@ -8,6 +8,8 @@ SEKG-QG 基于反馈的图谱自进化带来的高质量问题生成，目前只
 
 # Title : A Framework for Self-evolution of Knowledge Graphs Based on Feedback Driven Evolution
 # 一种基于反馈驱动演化的知识图谱自进化框架
+**中文版文章位置：[/SEKG-QG_Paper/KG_QG_Chinese.pdf](/SEKG-QG_Paper/KG_QG_Chinese.pdf)**
+**英文版文章位置：[SEKG-QG_Paper/KG_QG_version0.pdf](/SEKG-QG_Paper/KG_QG_version0.pdf)**
 
 ![Figure1](Picture/SEKG-QG-1_01.png)
 基于反馈驱动的SEKG-QG框架的技术路线图。
