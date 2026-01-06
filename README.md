@@ -1,19 +1,19 @@
 [![中关村学院 GitHub 组织](https://img.shields.io/badge/Linked%20to-bjzgcai%20Org-blue?logo=github)](https://github.com/bjzgcai)
 
-# SEKG-QG 一种基于反馈驱动演化的知识图谱自进化框架
+# SEKG-QG 一种基于反馈驱动的知识图谱自进化题目生成框架
 
 Here you can INPUT a PDF to Generate questions.
 
 SEKG-QG 基于反馈的图谱自进化带来的高质量问题生成，目前只是一个想法还不够完善，欢迎各位提出意见。
 
-# Title : A Framework for Self-evolution of Knowledge Graphs Based on Feedback Driven Evolution
+# Title : A Feedback-Driven Self-Evolving Knowledge Graph Framework for Automatic Question Generation
 
 **中文版文章位置：[SEKG-QG_Paper/KG_QG_Chinese.pdf](/SEKG-QG_Paper/KG_QG_Chinese.pdf)**
 
 **英文版文章位置：[SEKG-QG_Paper/KG_QG_version0.pdf](/SEKG-QG_Paper/KG_QG_version0.pdf)**
 
 ![Figure1](Picture/SEKG-QG-1_01.png)
-基于反馈驱动的SEKG-QG框架的技术路线图。
+图注：基于反馈驱动的SEKG-QG框架的技术路线图。
   系统从 PDF 文档中抽取文本段落，结合DeepSeek-V3大模型构建初始知识图谱。进一步使用更强的大模型（DeepSeek-R1）构建高置信参考知识图谱结合指标对初始图谱进行评估。随后基于初始知识图谱生成初始问题，并经过 DeepSeek-R1 结合指标进行质量评估，同时得到对初始问题的修改和反馈。最后这些修改和反馈反过来修正知识图谱，形成迭代闭环，使知识图谱与生成题目的质量能够协同提升（注意：序号表示框架执行的顺序，迭代闭环结构参见图 1 中红色箭头与紫色评估双向箭头的结合，顺序依次是序号3、紫色评估双向箭头、序号4、序号5，然后再次从序号3执行，开启新一轮的迭代）。
 
 
