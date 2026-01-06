@@ -1,14 +1,15 @@
 [![中关村学院 GitHub 组织](https://img.shields.io/badge/Linked%20to-bjzgcai%20Org-blue?logo=github)](https://github.com/bjzgcai)
 
-# SEKG-QG
+# SEKG-QG 一种基于反馈驱动演化的知识图谱自进化框架
 
 Here you can INPUT a PDF to Generate questions.
 
 SEKG-QG 基于反馈的图谱自进化带来的高质量问题生成，目前只是一个想法还不够完善，欢迎各位提出意见。
 
 # Title : A Framework for Self-evolution of Knowledge Graphs Based on Feedback Driven Evolution
-# 一种基于反馈驱动演化的知识图谱自进化框架
-**中文版文章位置：[/SEKG-QG_Paper/KG_QG_Chinese.pdf](/SEKG-QG_Paper/KG_QG_Chinese.pdf)**
+
+**中文版文章位置：[SEKG-QG_Paper/KG_QG_Chinese.pdf](/SEKG-QG_Paper/KG_QG_Chinese.pdf)**
+
 **英文版文章位置：[SEKG-QG_Paper/KG_QG_version0.pdf](/SEKG-QG_Paper/KG_QG_version0.pdf)**
 
 ![Figure1](Picture/SEKG-QG-1_01.png)
